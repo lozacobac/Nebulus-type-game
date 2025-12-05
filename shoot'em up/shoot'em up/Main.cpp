@@ -1,41 +1,24 @@
 #include <SDL3/SDL.h>
+#include "Button.h"
 
-int main(int argc, char** argv)
-{
-    SDL_Window* window;
-    SDL_Renderer* renderer;
+int main(int argc, char* argv[]) {
+	if (!SDL_Init(SDL_INIT_VIDEO)) {
+		SDL_Log("Erreur SDL_Init: %s", SDL_GetError());
+		return 1;
+	}
 
-    SDL_SetAppMetadata("SDL Test", "1.0", "games.anakata.test-sdl");
-    if (!SDL_Init(SDL_INIT_VIDEO))
-        return 1;
+	SDL_Window* window = SDL_CreateWindow("Bouton SDL 3", 800, 600, 0);
+	SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
 
-    if (!SDL_CreateWindowAndRenderer("HELLO SDL", 640, 480, SDL_WINDOW_RESIZABLE, &window, &renderer))
-        return 1;
+	Button buttons[2] = {
+		createButton(500, 250, 200, 100, "Cliquez-moi"),
+		createButton(100, 250, 200, 100, "Bondoir")
+	};
 
-    SDL_SetRenderLogicalPresentation(renderer, 640, 480, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+	runMainLoop(renderer, buttons, 2);
 
-    bool keepGoing = true;
-    do
-    {
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_EVENT_QUIT)
-                keepGoing = false;
-        }
-
-        const double now = ((double)SDL_GetTicks()) / 1000.0;  /* convert from milliseconds to seconds. */
-
-        const float red = (float)(0.5 + 0.5 * SDL_sin(now));
-        const float green = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 2 / 3));
-        const float blue = (float)(0.5 + 0.5 * SDL_sin(now + SDL_PI_D * 4 / 3));
-        SDL_SetRenderDrawColorFloat(renderer, red, green, blue, 1.0f);
-
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
-    } while (keepGoing);
-
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    return 0;
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+	return 0;
 }
