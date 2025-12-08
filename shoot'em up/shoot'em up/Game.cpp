@@ -37,6 +37,8 @@ int Game::run() {
     // Initialiser le bouton du menu
     menuButton = createButton(220, 200, 200, 50, "Start");
 
+    SDL_StartTextInput(window);
+
     bool keepGoing = true;
 
     do {
@@ -87,6 +89,10 @@ int Game::run() {
             }
         }
 
+        if (currentState == State::CUSTOM) {
+            custom.update();
+        }
+
         SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.0f, 0.0f, 1.0f);
         SDL_RenderClear(renderer);
 
@@ -115,6 +121,7 @@ int Game::run() {
         SDL_RenderPresent(renderer);
     } while (keepGoing);
 
+    SDL_StopTextInput(window);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
