@@ -1,0 +1,52 @@
+#include "Player.h"
+
+Player::Player() : x(400), y(500), lives(3), rect({ x, y, 32, 32 }) {}
+
+void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bool*
+    float speed = 200.0f;
+    if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A])
+        x -= speed * deltaTime;
+    if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D])
+        x += speed * deltaTime;
+    if (x < 0)
+        x = 0;
+    if (x > 800-rect.w)
+        x = 800-rect.w;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+
+    if (keys[SDL_SCANCODE_SPACE] && shotTimer >= 0.2f) {
+        projectiles.push_back({
+            x + 12,
+            y, 
+            0, 
+            -300.0f, 
+            true, 
+            {x + rect.w / 2 - 4,y,8,8}
+        });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+        it->update(deltaTime);
+        if (it->isOffScreen(800, 600))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void Player::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    SDL_RenderFillRect(renderer, &rect);
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+    for (auto& p : projectiles)
+        SDL_RenderFillRect(renderer, &p.rect);
+}
+
+bool Player::checkCollision(const SDL_FRect& other) {
+    return SDL_HasRectIntersectionFloat(&rect, &other);
+}

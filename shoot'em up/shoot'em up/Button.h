@@ -1,10 +1,11 @@
 #pragma once
 #include <SDL3/SDL.h>
+#include <string>
 #include <stdbool.h>
 
 typedef struct {
     SDL_FRect rect;
-    const char* text;
+    std::string text;
     SDL_Color color;
     SDL_Color hoverColor;
     SDL_Color textColor;
