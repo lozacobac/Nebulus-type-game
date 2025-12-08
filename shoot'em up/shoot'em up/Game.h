@@ -22,11 +22,11 @@ private:
     Level3 level3;
     Level4 level4;
 
+    Start start;
+
     enum class State { MENU, CUSTOM, SELECT, LEVEL1, LEVEL2, LEVEL3, LEVEL4 };
     State currentState = State::MENU;
 
-    Button menuButton;
-
-    void handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom);
+    void handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom, bool& shouldQuit);
     void drawMenu(SDL_Renderer* renderer);
 };

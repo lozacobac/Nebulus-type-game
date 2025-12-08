@@ -1,9 +1,14 @@
 #include "Game.h"
 
-void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
-    handleButtonEvent(&menuButton, const_cast<SDL_Event*>(&event));
-    if (isButtonClicked(&menuButton, const_cast<SDL_Event*>(&event))) {
+void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom, bool& shouldQuit) {
+    handleButtonEvent(&start.startButton, const_cast<SDL_Event*>(&event));
+    handleButtonEvent(&start.leaveButton, const_cast<SDL_Event*>(&event));
+
+    if (isButtonClicked(&start.startButton, const_cast<SDL_Event*>(&event))) {
         shouldSwitchToCustom = true;
+    }
+    if (isButtonClicked(&start.leaveButton, const_cast<SDL_Event*>(&event))) {
+        shouldQuit = true;
     }
 }
 
@@ -11,7 +16,8 @@ void Game::drawMenu(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.5f, 1.0f, 1.0f);
     SDL_RenderFillRect(renderer, nullptr);
 
-    renderButton(renderer, &menuButton);
+    renderButton(renderer, &start.startButton);
+    renderButton(renderer, &start.leaveButton);
 }
 
 int Game::run() {
@@ -20,18 +26,15 @@ int Game::run() {
 
     SDL_SetAppMetadata("AeroBlade", "1.0", "games.anakata.test-sdl");
 
-    if (!initializeSDL()) {
+    if (!start.initializeSDL()) {
         SDL_Quit();
         return 1;
     }
 
-    if (!CreateWindowAndRenderer(window, renderer)) {
+    if (!start.CreateWindowAndRenderer(window, renderer)) {
         SDL_Quit();
         return 1;
     }
-
-    // Initialiser le bouton du menu
-    menuButton = createButton(220, 200, 200, 50, "Start");
 
     bool keepGoing = true;
 
@@ -44,8 +47,10 @@ int Game::run() {
             else {
                 if (currentState == State::MENU) {
                     bool shouldSwitch = false;
-                    handleMenuEvent(event, shouldSwitch);
+                    bool shouldQuit = false;
+                    handleMenuEvent(event, shouldSwitch, shouldQuit);
                     if (shouldSwitch) currentState = State::CUSTOM;
+                    if (shouldQuit)keepGoing = false;
                 }
                 else if (currentState == State::CUSTOM) {
                     bool shouldSwitch = false;
