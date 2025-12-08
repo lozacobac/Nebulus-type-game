@@ -1,84 +1,126 @@
 #include "Game.h"
-#include <iostream>
 
-void Game::handleMenuEvent(const SDL_Event& event, bool& startGame) {
+void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
     handleButtonEvent(&menuButton, const_cast<SDL_Event*>(&event));
     if (isButtonClicked(&menuButton, const_cast<SDL_Event*>(&event))) {
-        startGame = true;
+        shouldSwitchToCustom = true;
     }
 }
 
 void Game::drawMenu(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 0, 128, 255, 255);
+    SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.5f, 1.0f, 1.0f);
     SDL_RenderFillRect(renderer, nullptr);
-    renderButton(renderer, &menuButton);
-}
 
-void Game::loadLevel(int index) {
-    if (index < 0 || index >= (int)levelsOrder.size()) return;
-    currentLevel = std::make_unique<Level2>(levelsOrder[index]);
+    renderButton(renderer, &menuButton);
 }
 
 int Game::run() {
     SDL_Window* window = nullptr;
     SDL_Renderer* renderer = nullptr;
 
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) return 1;
-    if (SDL_CreateWindowAndRenderer(800, 600, 0, &window, &renderer) != 0) return 1;
+    SDL_SetAppMetadata("AeroBlade", "1.0", "games.anakata.test-sdl");
 
-    menuButton = createButton(300, 250, 200, 50, "Start");
+    if (!initializeSDL()) {
+        SDL_Quit();
+        return 1;
+    }
 
-    // Charger l'ordre des niveaux depuis un fichier texte
-    LevelLoader loader;
-    int rows, cols;
-    loader.load("levels_order.txt", levelsOrder, rows, cols);
+    if (!CreateWindowAndRenderer(window, renderer)) {
+        SDL_Quit();
+        return 1;
+    }
+
+    // Initialiser le bouton du menu
+    menuButton = createButton(220, 200, 200, 50, "Start");
+
+    SDL_StartTextInput(window);
 
     bool keepGoing = true;
-    while (keepGoing) {
+
+    do {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) keepGoing = false;
-            else if (currentState == State::MENU) {
-                bool startGame = false;
-                handleMenuEvent(event, startGame);
-                if (startGame) {
-                    currentLevelIndex = 0;
-                    loadLevel(currentLevelIndex);
-                    currentState = State::LEVEL;
-                }
+            if (event.type == SDL_EVENT_QUIT) {
+                keepGoing = false;
             }
-            else if (currentState == State::LEVEL && currentLevel) {
-                bool switchToMenu = false;
-                currentLevel->handleEvent(event, switchToMenu);
-                if (switchToMenu) currentState = State::MENU;
+            else {
+                if (currentState == State::MENU) {
+                    bool shouldSwitch = false;
+                    handleMenuEvent(event, shouldSwitch);
+                    if (shouldSwitch) currentState = State::CUSTOM;
+                }
+                else if (currentState == State::CUSTOM) {
+                    bool shouldSwitch = false;
+                    custom.handleEvent(event, shouldSwitch);
+                    if (shouldSwitch) currentState = State::SELECT;
+                }
+                else if (currentState == State::SELECT) {
+                    int selectedLevel = 0;
+                    select.handleEvent(event, selectedLevel);
+                    if (selectedLevel == 1) currentState = State::LEVEL1;
+                    else if (selectedLevel == 2) currentState = State::LEVEL2;
+                    else if (selectedLevel == 3) currentState = State::LEVEL3;
+                    else if (selectedLevel == 4) currentState = State::LEVEL4;
+                }
+                else if (currentState == State::LEVEL1) {
+                    bool shouldSwitch = false;
+                    level1.handleEvent(event, shouldSwitch);
+                    if (shouldSwitch) currentState = State::MENU;
+                }
+                else if (currentState == State::LEVEL2) {
+                    bool shouldSwitch = false;
+                    level2.handleEvent(event, shouldSwitch);
+                    if (shouldSwitch) currentState = State::MENU;
+                }
+                else if (currentState == State::LEVEL3) {
+                    bool shouldSwitch = false;
+                    level3.handleEvent(event, shouldSwitch);
+                    if (shouldSwitch) currentState = State::MENU;
+                }
+                else if (currentState == State::LEVEL4) {
+                    bool shouldSwitch = false;
+                    level4.handleEvent(event, shouldSwitch);
+                    if (shouldSwitch) currentState = State::MENU;
+                }
             }
         }
 
-        float deltaTime = 1.0f / 60.0f;
+        if (currentState == State::CUSTOM) {
+            custom.update();
+        }
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.0f, 0.0f, 1.0f);
         SDL_RenderClear(renderer);
 
-        if (currentState == State::MENU) drawMenu(renderer);
-        else if (currentState == State::LEVEL && currentLevel) {
-            currentLevel->update(deltaTime);
-            currentLevel->draw(renderer);
-
-            if (currentLevel->isCompleted()) {
-                currentLevelIndex++;
-                if (currentLevelIndex < (int)levelsOrder.size())
-                    loadLevel(currentLevelIndex);
-                else
-                    currentState = State::MENU;
-            }
+        if (currentState == State::MENU) {
+            drawMenu(renderer);
+        }
+        else if (currentState == State::CUSTOM) {
+            custom.draw(renderer);
+        }
+        else if (currentState == State::SELECT) {
+            select.draw(renderer);
+        }
+        else if (currentState == State::LEVEL1) {
+            level1.draw(renderer);
+        }
+        else if (currentState == State::LEVEL2) {
+            level2.draw(renderer);
+        }
+        else if (currentState == State::LEVEL3) {
+            level3.draw(renderer);
+        }
+        else if (currentState == State::LEVEL4) {
+            level4.draw(renderer);
         }
 
         SDL_RenderPresent(renderer);
-        SDL_Delay(16);
-    }
+    } while (keepGoing);
 
+    SDL_StopTextInput(window);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+
     return 0;
 }
