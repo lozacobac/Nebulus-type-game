@@ -42,14 +42,13 @@
     <ClCompile Include="Button.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-<<<<<<< HEAD
     <ClCompile Include="Start.cpp">
-=======
+		<Filter>Fichiers sources</Filter>
+	</ClCompile>
     <ClCompile Include="TextBox.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="Label.cpp">
->>>>>>> Custom-Perso
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -78,14 +77,13 @@
     <ClInclude Include="Button.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="Start.h">
-=======
+		<Filter>Fichiers d%27en-tête</Filter>
+	</ClInclude>
     <ClInclude Include="TextBox.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Label.h">
->>>>>>> Custom-Perso
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
