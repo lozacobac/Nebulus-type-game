@@ -1,8 +1,42 @@
 #include "Game.h"
+#include <iostream>
+
+bool Game::initializeSDL() {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        std::cerr << "[ERROR] SDL_Init failed: " << SDL_GetError() << "\n";
+        return false;
+    }
+    return true;
+}
+
+bool Game::CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer) {
+    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, 0, &window, &renderer)) {
+        std::cerr << "[ERROR] SDL_CreateWindowAndRenderer failed: " << SDL_GetError() << "\n";
+        return false;
+    }
+    return true;
+}
+
+void Game::loadLevel(int index) {
+    if (index < 0 || index >= (int)levelsOrder.size()) {
+        std::cerr << "[ERROR] Invalid level index: " << index << "\n";
+        return;
+    }
+
+    currentLevel = std::make_unique<LevelBase>();
+    if (!currentLevel->loadFromFile(levelsOrder[index])) {
+        std::cerr << "[ERROR] Failed to load level: " << levelsOrder[index] << "\n";
+        currentLevel = nullptr;
+    }
+    else {
+        std::cout << "[INFO] Level loaded: " << levelsOrder[index] << "\n";
+    }
+}
 
 void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
-    handleButtonEvent(&menuButton, const_cast<SDL_Event*>(&event));
-    if (isButtonClicked(&menuButton, const_cast<SDL_Event*>(&event))) {
+    SDL_Event ev = event;
+    handleButtonEvent(&menuButton, &ev);
+    if (isButtonClicked(&menuButton, &ev)) {
         shouldSwitchToCustom = true;
     }
 }
@@ -10,7 +44,6 @@ void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
 void Game::drawMenu(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.5f, 1.0f, 1.0f);
     SDL_RenderFillRect(renderer, nullptr);
-
     renderButton(renderer, &menuButton);
 }
 
@@ -30,14 +63,28 @@ int Game::run() {
         return 1;
     }
 
-    // Initialiser le bouton du menu
-    menuButton = createButton(220, 200, 200, 50, "Start");
+    // Charger l'ordre des niveaux
+    if (!LevelLoader::loadLevelsOrder("Levels_order.txt", levelsOrder)) {
+        std::cerr << "[ERROR] Failed to load levels order\n";
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
 
+    menuButton = createButton(220.0f, 200.0f, 200.0f, 50.0f, "Start");
     SDL_StartTextInput(window);
 
     bool keepGoing = true;
+    Uint64 lastTime = SDL_GetTicks();
+    currentLevelIndex = 0;
+    currentState = State::MENU;
 
     do {
+        Uint64 currentTime = SDL_GetTicks();
+        float deltaTime = (currentTime - lastTime) / 1000.0f;
+        lastTime = currentTime;
+
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
@@ -47,48 +94,66 @@ int Game::run() {
                 if (currentState == State::MENU) {
                     bool shouldSwitch = false;
                     handleMenuEvent(event, shouldSwitch);
-                    if (shouldSwitch) currentState = State::CUSTOM;
+                    if (shouldSwitch) {
+                        currentState = State::CUSTOM;
+                    }
                 }
                 else if (currentState == State::CUSTOM) {
                     bool shouldSwitch = false;
                     custom.handleEvent(event, shouldSwitch);
-                    if (shouldSwitch) currentState = State::SELECT;
+                    if (shouldSwitch) {
+                        currentState = State::SELECT;
+                    }
                 }
                 else if (currentState == State::SELECT) {
                     int selectedLevel = 0;
                     select.handleEvent(event, selectedLevel);
-                    if (selectedLevel == 1) currentState = State::LEVEL1;
-                    else if (selectedLevel == 2) currentState = State::LEVEL2;
-                    else if (selectedLevel == 3) currentState = State::LEVEL3;
-                    else if (selectedLevel == 4) currentState = State::LEVEL4;
+                    if (selectedLevel >= 1 && selectedLevel <= (int)levelsOrder.size()) {
+                        currentLevelIndex = selectedLevel - 1;
+                        loadLevel(currentLevelIndex);
+                        if (currentLevel) {
+                            currentState = State::LEVEL;
+                        }
+                    }
                 }
-                else if (currentState == State::LEVEL1) {
+                else if (currentState == State::LEVEL && currentLevel) {
                     bool shouldSwitch = false;
-                    level1.handleEvent(event, shouldSwitch);
-                    if (shouldSwitch) currentState = State::MENU;
-                }
-                else if (currentState == State::LEVEL2) {
-                    bool shouldSwitch = false;
-                    level2.handleEvent(event, shouldSwitch);
-                    if (shouldSwitch) currentState = State::MENU;
-                }
-                else if (currentState == State::LEVEL3) {
-                    bool shouldSwitch = false;
-                    level3.handleEvent(event, shouldSwitch);
-                    if (shouldSwitch) currentState = State::MENU;
-                }
-                else if (currentState == State::LEVEL4) {
-                    bool shouldSwitch = false;
-                    level4.handleEvent(event, shouldSwitch);
-                    if (shouldSwitch) currentState = State::MENU;
+                    currentLevel->handleEvent(event, shouldSwitch);
+                    if (shouldSwitch) {
+                        currentLevel = nullptr;
+                        currentState = State::MENU;
+                    }
                 }
             }
         }
 
+        // Update
         if (currentState == State::CUSTOM) {
             custom.update();
         }
+        else if (currentState == State::LEVEL && currentLevel) {
+            currentLevel->update(deltaTime);
 
+            if (currentLevel->isCompleted()) {
+                std::cout << "[INFO] Level completed!\n";
+                currentLevelIndex++;
+                if (currentLevelIndex < (int)levelsOrder.size()) {
+                    loadLevel(currentLevelIndex);
+                }
+                else {
+                    std::cout << "[INFO] All levels completed!\n";
+                    currentLevel = nullptr;
+                    currentState = State::MENU;
+                }
+            }
+            else if (currentLevel->isFailed()) {
+                std::cout << "[INFO] Level failed!\n";
+                currentLevel = nullptr;
+                currentState = State::MENU;
+            }
+        }
+
+        // Draw
         SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.0f, 0.0f, 1.0f);
         SDL_RenderClear(renderer);
 
@@ -101,17 +166,8 @@ int Game::run() {
         else if (currentState == State::SELECT) {
             select.draw(renderer);
         }
-        else if (currentState == State::LEVEL1) {
-            level1.draw(renderer);
-        }
-        else if (currentState == State::LEVEL2) {
-            level2.draw(renderer);
-        }
-        else if (currentState == State::LEVEL3) {
-            level3.draw(renderer);
-        }
-        else if (currentState == State::LEVEL4) {
-            level4.draw(renderer);
+        else if (currentState == State::LEVEL && currentLevel) {
+            currentLevel->draw(renderer);
         }
 
         SDL_RenderPresent(renderer);

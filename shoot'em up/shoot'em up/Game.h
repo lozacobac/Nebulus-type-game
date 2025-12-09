@@ -3,14 +3,10 @@
 #include <memory>
 #include <vector>
 #include <string>
-
-#include "Start.h"
+#include "Button.h"
 #include "Select.h"
 #include "Custom.h"
-#include "Level1.h"
-#include "Level2.h"
-#include "Level3.h"
-#include "Level4.h"
+#include "LevelBase.h"
 #include "LevelLoader.h"
 
 class Game
@@ -21,18 +17,19 @@ public:
 private:
     Select select;
     Custom custom;
-
     std::vector<std::string> levelsOrder;
-    int currentLevelIndex = 0;
-
-    std::unique_ptr<LevelBase> currentLevel = nullptr;
+    int currentLevelIndex;
+    std::unique_ptr<LevelBase> currentLevel;
 
     enum class State { MENU, CUSTOM, SELECT, LEVEL };
-    State currentState = State::MENU;
+    State currentState;
 
     Button menuButton;
 
-    void loadLevel(int index, SDL_Renderer* renderer);
+    void loadLevel(int index);
     void handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom);
     void drawMenu(SDL_Renderer* renderer);
+
+    bool initializeSDL();
+    bool CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer);
 };
