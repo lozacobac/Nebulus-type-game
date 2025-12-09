@@ -10,7 +10,7 @@ bool Game::initializeSDL() {
 }
 
 bool Game::CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer) {
-    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, 0, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("AeroBlade", 1280, 720, 0, &window, &renderer)) {
         std::cerr << "[ERROR] SDL_CreateWindowAndRenderer failed: " << SDL_GetError() << "\n";
         return false;
     }
@@ -34,20 +34,44 @@ void Game::loadLevel(int index) {
 }
 
 void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
+    // Debug : afficher la position de la souris
+    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+        std::cout << "[DEBUG] Mouse click at: " << event.button.x << ", " << event.button.y << "\n";
+        std::cout << "[DEBUG] Start button: x=" << start.startButton.rect.x
+            << " y=" << start.startButton.rect.y
+            << " w=" << start.startButton.rect.w
+            << " h=" << start.startButton.rect.h << "\n";
+        std::cout << "[DEBUG] Leave button: x=" << start.leaveButton.rect.x
+            << " y=" << start.leaveButton.rect.y
+            << " w=" << start.leaveButton.rect.w
+            << " h=" << start.leaveButton.rect.h << "\n";
+    }
+
     SDL_Event ev = event;
-    handleButtonEvent(&menuButton, &ev);
-    if (isButtonClicked(&menuButton, &ev)) {
+
+    // Gérer les événements de survol et de clic
+    handleButtonEvent(&start.startButton, &ev);
+    handleButtonEvent(&start.leaveButton, &ev);
+
+    // Vérifier si le bouton Start est cliqué
+    if (isButtonClicked(&start.startButton, &ev)) {
+        std::cout << "[INFO] Start button clicked!\n";
         shouldSwitchToCustom = true;
     }
-    if (isButtonClicked(&start.leaveButton, const_cast<SDL_Event*>(&event))) {
+
+    // Vérifier si le bouton Leave est cliqué
+    if (isButtonClicked(&start.leaveButton, &ev)) {
+        std::cout << "[INFO] Leave button clicked!\n";
         shouldQuit = true;
     }
 }
 
 void Game::drawMenu(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.5f, 1.0f, 1.0f);
-    SDL_RenderFillRect(renderer, nullptr);
-    renderButton(renderer, &menuButton);
+    SDL_RenderClear(renderer);
+
+    renderButton(renderer, &start.startButton);
+    renderButton(renderer, &start.leaveButton);
 }
 
 int Game::run() {
@@ -75,9 +99,6 @@ int Game::run() {
         return 1;
     }
 
-    menuButton = createButton(220.0f, 200.0f, 200.0f, 50.0f, "Start");
-    SDL_StartTextInput(window);
-
     bool keepGoing = true;
     Uint64 lastTime = SDL_GetTicks();
     currentLevelIndex = 0;
@@ -93,39 +114,45 @@ int Game::run() {
             if (event.type == SDL_EVENT_QUIT) {
                 keepGoing = false;
             }
-            else {
-                if (currentState == State::MENU) {
-                    bool shouldSwitch = false;
-                    handleMenuEvent(event, shouldSwitch);
-                    if (shouldSwitch) {
-                        currentState = State::CUSTOM;
+
+            if (currentState == State::MENU) {
+                // Traiter TOUS les événements pour le menu
+                bool shouldSwitch = false;
+                handleMenuEvent(event, shouldSwitch);
+
+                // Vérifier si on doit quitter
+                if (shouldQuit) {
+                    keepGoing = false;
+                }
+
+                if (shouldSwitch) {
+                    currentState = State::CUSTOM;
+                }
+            }
+            else if (currentState == State::CUSTOM) {
+                bool shouldSwitch = false;
+                custom.handleEvent(event, shouldSwitch);
+                if (shouldSwitch) {
+                    currentState = State::SELECT;
+                }
+            }
+            else if (currentState == State::SELECT) {
+                int selectedLevel = 0;
+                select.handleEvent(event, selectedLevel);
+                if (selectedLevel >= 1 && selectedLevel <= (int)levelsOrder.size()) {
+                    currentLevelIndex = selectedLevel - 1;
+                    loadLevel(currentLevelIndex);
+                    if (currentLevel) {
+                        currentState = State::LEVEL;
                     }
                 }
-                else if (currentState == State::CUSTOM) {
-                    bool shouldSwitch = false;
-                    custom.handleEvent(event, shouldSwitch);
-                    if (shouldSwitch) {
-                        currentState = State::SELECT;
-                    }
-                }
-                else if (currentState == State::SELECT) {
-                    int selectedLevel = 0;
-                    select.handleEvent(event, selectedLevel);
-                    if (selectedLevel >= 1 && selectedLevel <= (int)levelsOrder.size()) {
-                        currentLevelIndex = selectedLevel - 1;
-                        loadLevel(currentLevelIndex);
-                        if (currentLevel) {
-                            currentState = State::LEVEL;
-                        }
-                    }
-                }
-                else if (currentState == State::LEVEL && currentLevel) {
-                    bool shouldSwitch = false;
-                    currentLevel->handleEvent(event, shouldSwitch);
-                    if (shouldSwitch) {
-                        currentLevel = nullptr;
-                        currentState = State::MENU;
-                    }
+            }
+            else if (currentState == State::LEVEL && currentLevel) {
+                bool shouldSwitch = false;
+                currentLevel->handleEvent(event, shouldSwitch);
+                if (shouldSwitch) {
+                    currentLevel = nullptr;
+                    currentState = State::MENU;
                 }
             }
         }

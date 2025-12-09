@@ -8,6 +8,7 @@
 #include "Custom.h"
 #include "LevelBase.h"
 #include "LevelLoader.h"
+#include "Start.h"
 
 class Game
 {
@@ -15,11 +16,13 @@ public:
     int run();
 
 private:
+    Start start;
     Select select;
     Custom custom;
     std::vector<std::string> levelsOrder;
     int currentLevelIndex;
     std::unique_ptr<LevelBase> currentLevel;
+    bool shouldQuit = false;
 
     enum class State { MENU, CUSTOM, SELECT, LEVEL };
     State currentState;
