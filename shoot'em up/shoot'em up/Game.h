@@ -1,13 +1,13 @@
 #pragma once
 #include <SDL3/SDL.h>
-#include "Start.h"
+#include <memory>
+#include <vector>
+#include <string>
+#include "Button.h"
 #include "Select.h"
 #include "Custom.h"
-#include "Level1.h"
-#include "Level2.h"
-#include "Level3.h"
-#include "Level4.h"
-#include "Button.h"
+#include "LevelBase.h"
+#include "LevelLoader.h"
 
 class Game
 {
@@ -17,16 +17,19 @@ public:
 private:
     Select select;
     Custom custom;
-    Level1 level1;
-    Level2 level2;
-    Level3 level3;
-    Level4 level4;
+    std::vector<std::string> levelsOrder;
+    int currentLevelIndex;
+    std::unique_ptr<LevelBase> currentLevel;
 
-    Start start;
+    enum class State { MENU, CUSTOM, SELECT, LEVEL };
+    State currentState;
 
-    enum class State { MENU, CUSTOM, SELECT, LEVEL1, LEVEL2, LEVEL3, LEVEL4 };
-    State currentState = State::MENU;
+    Button menuButton;
 
-    void handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom, bool& shouldQuit);
+    void loadLevel(int index);
+    void handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom);
     void drawMenu(SDL_Renderer* renderer);
+
+    bool initializeSDL();
+    bool CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer);
 };

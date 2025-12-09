@@ -9,7 +9,7 @@ Button createButton(float x, float y, float w, float h, const char* text) {
     btn.rect.w = w;
     btn.rect.h = h;
 
-    btn.text = text;
+    btn.text = text;  // Maintenant std::string, donc assignation directe
 
     btn.color.r = 70;
     btn.color.g = 130;
@@ -80,7 +80,7 @@ void renderButton(SDL_Renderer* renderer, Button* btn) {
     SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
     SDL_RenderRect(renderer, &btn->rect);
 
-    const char* text = btn->text;
+    const char* text = btn->text.c_str();  // Conversion std::string vers const char*
     int charWidth = 8, charHeight = 16;
     int textWidth = strlen(text) * charWidth;
 
