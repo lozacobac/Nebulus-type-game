@@ -7,7 +7,7 @@ LevelBase::LevelBase()
     levelCompleted(false),
     levelFailed(false)
 {
-    menuButton = createButton(220.0f, 400.0f, 200.0f, 50.0f, "Menu");
+    menuButton = createButton(10, 425.0f, 75.0f, 50.0f, "Menu");
 }
 
 bool LevelBase::loadFromFile(const std::string& scriptPath) {
