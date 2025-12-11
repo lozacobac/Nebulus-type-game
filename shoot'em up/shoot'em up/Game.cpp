@@ -61,7 +61,7 @@ int Game::run() {
         return 1;
     }
 
-    if (!start.CreateWindowAndRenderer(window, renderer)) {
+    if (!CreateWindowAndRenderer(window, renderer)) {
         SDL_Quit();
         return 1;
     }
@@ -111,7 +111,13 @@ int Game::run() {
                 else if (currentState == State::SELECT) {
                     int selectedLevel = 0;
                     select.handleEvent(event, selectedLevel);
-                    if (selectedLevel >= 1 && selectedLevel <= (int)levelsOrder.size()) {
+
+                    // Gestion du retour au menu depuis la transition
+                    if (selectedLevel == -1) {
+                        currentState = State::MENU;
+                    }
+                    // Gestion de la sélection de niveau
+                    else if (selectedLevel >= 1 && selectedLevel <= (int)levelsOrder.size()) {
                         currentLevelIndex = selectedLevel - 1;
                         loadLevel(currentLevelIndex);
                         if (currentLevel) {
@@ -139,11 +145,16 @@ int Game::run() {
 
             if (currentLevel->isCompleted()) {
                 std::cout << "[INFO] Level completed!\n";
-                currentLevelIndex++;
-                if (currentLevelIndex < (int)levelsOrder.size()) {
-                    loadLevel(currentLevelIndex);
+
+                // Vérifier s'il y a un niveau suivant
+                if (currentLevelIndex + 1 < (int)levelsOrder.size()) {
+                    // Afficher l'écran de transition
+                    select.showWorldTransition(currentLevelIndex + 1);
+                    currentLevel = nullptr;
+                    currentState = State::SELECT;
                 }
                 else {
+                    // Tous les niveaux sont terminés
                     std::cout << "[INFO] All levels completed!\n";
                     currentLevel = nullptr;
                     currentState = State::MENU;

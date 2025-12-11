@@ -53,8 +53,6 @@ void Select::handleEvent(const SDL_Event& event, int& selectedLevel) {
         }
     }
 }
-
-
 void Select::draw(SDL_Renderer* renderer) {
     if (inTransition) {
         // Dessiner l'ecran de transition
