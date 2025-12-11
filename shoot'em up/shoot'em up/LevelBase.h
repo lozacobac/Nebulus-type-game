@@ -21,6 +21,7 @@ protected:
     Uint64 levelStartTime;
     bool levelCompleted;
     bool levelFailed;
+    int score;
 
     virtual void executeCommand(const ScriptCommand& cmd);
     void handleCollisions();
@@ -37,4 +38,5 @@ public:
 
     bool isCompleted() const;
     bool isFailed() const;
+    int getScore() const { return score; }
 };

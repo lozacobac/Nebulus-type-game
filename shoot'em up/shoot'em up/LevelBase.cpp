@@ -5,9 +5,10 @@ LevelBase::LevelBase()
     : currentCommand(0),
     levelStartTime(0),
     levelCompleted(false),
-    levelFailed(false)
+    levelFailed(false),
+    score(0)
 {
-    menuButton = createButton(10, 425.0f, 75.0f, 50.0f, "Menu");
+    menuButton = createButton(10, 480.0f, 75.0f, 50.0f, "Menu");
 }
 
 bool LevelBase::loadFromFile(const std::string& scriptPath) {
@@ -20,6 +21,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath) {
     currentCommand = 0;
     levelCompleted = false;
     levelFailed = false;
+    score = 0;
     enemies.clear();
     allProjectiles.clear();
 
@@ -73,12 +75,15 @@ void LevelBase::handleCollisions() {
         }
         else {
             if (player.checkCollision(pit->rect)) {
-                player.lives--;
-                hit = true;
-                std::cout << "[INFO] Player hit! Lives: " << player.lives << "\n";
-                if (player.lives <= 0) {
-                    levelFailed = true;
+                if (!player.isInvincible()) {
+                    player.lives--;
+                    player.invicibilityTimer = 1.0f;
+                    std::cout << "[INFO] Player hit! Lives : " << player.lives << "\n";
+                    if (player.lives <= 0) {
+                        levelFailed = true;
+                    }
                 }
+                hit = true;
             }
         }
 

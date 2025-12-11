@@ -10,7 +10,7 @@ bool Game::initializeSDL() {
 }
 
 bool Game::CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer) {
-    if (!SDL_CreateWindowAndRenderer("AeroBlade", 1280, 720, 0, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("AeroBlade", 960, 540, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
         std::cerr << "[ERROR] SDL_CreateWindowAndRenderer failed: " << SDL_GetError() << "\n";
         return false;
     }
@@ -85,7 +85,7 @@ int Game::run() {
         return 1;
     }
 
-    if (!start.CreateWindowAndRenderer(window, renderer)) {
+    if (!CreateWindowAndRenderer(window, renderer)) {
         SDL_Quit();
         return 1;
     }
@@ -165,7 +165,9 @@ int Game::run() {
             currentLevel->update(deltaTime);
 
             if (currentLevel->isCompleted()) {
-                std::cout << "[INFO] Level completed!\n";
+                int levelScore = currentLevel->getScore();
+                totalScore += levelScore;
+                std::cout << "[INFO] Level completed! Score earned : " << levelScore << "| Total = " << totalScore << "\n";
                 currentLevelIndex++;
                 if (currentLevelIndex < (int)levelsOrder.size()) {
                     loadLevel(currentLevelIndex);
@@ -177,7 +179,8 @@ int Game::run() {
                 }
             }
             else if (currentLevel->isFailed()) {
-                std::cout << "[INFO] Level failed!\n";
+                std::cout << "[INFO] Level failed!\n" << "[INFO] Score for this run : " << totalScore << "\n";
+                totalScore = 0;
                 currentLevel = nullptr;
                 currentState = State::MENU;
             }

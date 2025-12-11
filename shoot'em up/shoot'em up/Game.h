@@ -23,6 +23,7 @@ private:
     int currentLevelIndex;
     std::unique_ptr<LevelBase> currentLevel;
     bool shouldQuit = false;
+    int totalScore = 0;
 
     enum class State { MENU, CUSTOM, SELECT, LEVEL };
     State currentState;

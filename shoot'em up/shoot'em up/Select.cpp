@@ -1,10 +1,10 @@
 #include "Select.h"
 
 Select::Select() : inTransition(false) {
-    buttonLevel1 = createButton(100, 100, 150, 50, "Level 1");
-    buttonLevel2 = createButton(390, 100, 150, 50, "Level 2");
-    buttonLevel3 = createButton(100, 330, 150, 50, "Level 3");
-    buttonLevel4 = createButton(390, 330, 150, 50, "Level 4");
+    buttonLevel1 = createButton(250, 100, 150, 50, "Level 1");
+    buttonLevel2 = createButton(490, 100, 150, 50, "Level 2");
+    buttonLevel3 = createButton(250, 330, 150, 50, "Level 3");
+    buttonLevel4 = createButton(490, 330, 150, 50, "Level 4");
 
     // Boutons pour l'ecran de transition
     buttonBackToMenu = createButton(170, 300, 120, 50, "Menu");

@@ -44,7 +44,7 @@ void BasicEnemy::update(float deltaTime, Player& player) {
 }
 
 void BasicEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
     SDL_RenderFillRect(renderer, &rect);
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
@@ -87,7 +87,7 @@ void ZigzagEnemy::update(float deltaTime, Player& player) {
 
 
 void ZigzagEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 255, 100, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 58, 164, 118, 255);
     SDL_RenderFillRect(renderer, &rect);
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
