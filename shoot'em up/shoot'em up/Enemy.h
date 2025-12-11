@@ -42,4 +42,18 @@ public:
     int getType() const override;
 };
 
+class ShulkerEnemy : public Enemy {
+private:
+    float invulnerabilityTimer;  // Pour suivre le temps
+    bool isInvulnerable;         // État actuel
+public:
+    ShulkerEnemy(float px, float py);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    bool checkCollision(const SDL_FRect& other) override;  // Override pour gérer l'invulnérabilité
+    int getType() const override;
+};
+
+
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y);

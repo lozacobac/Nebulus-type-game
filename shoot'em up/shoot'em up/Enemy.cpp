@@ -95,8 +95,88 @@ void ZigzagEnemy::render(SDL_Renderer* renderer) {
 
 int ZigzagEnemy::getType() const { return 2; }
 
+ShulkerEnemy::ShulkerEnemy(float px, float py)
+    : Enemy(px, py),
+    invulnerabilityTimer(0.0f),
+    isInvulnerable(false)  // Commence vulnérable
+{
+}
+
+void ShulkerEnemy::update(float deltaTime, Player& player) {
+    y += 50.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    // Gestion du cycle d'invulnérabilité
+    invulnerabilityTimer += deltaTime;
+
+    // Cycle de 3 secondes : 2s vulnérable, 2s invulnérable
+    if (invulnerabilityTimer < 2.0f) {
+        isInvulnerable = false;  // 0-1s : Vulnérable
+    }
+    else if (invulnerabilityTimer < 4.0f) {
+        isInvulnerable = true;   // 1-4s : Invulnérable
+    }
+    else {
+        invulnerabilityTimer = 0.0f;  // Recommence le cycle
+    }
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 5.0f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            100.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(800, 600))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void ShulkerEnemy::render(SDL_Renderer* renderer) {
+    // Change de couleur selon l'état
+    if (isInvulnerable) {
+        // Gris foncé quand invulnérable (comme une coquille fermée)
+        SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+    }
+    else {
+        // Jaune-vert quand vulnérable (comme une coquille ouverte)
+        SDL_SetRenderDrawColor(renderer, 100, 100, 0, 255);
+    }
+
+    SDL_RenderFillRect(renderer, &rect);
+
+    // Dessiner les projectiles
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles)
+        SDL_RenderFillRect(renderer, &p.rect);
+}
+
+bool ShulkerEnemy::checkCollision(const SDL_FRect& other) {
+    // Si invulnérable, ignore les collisions
+    if (isInvulnerable) {
+        return false;
+    }
+    // Sinon, collision normale
+    return SDL_HasRectIntersectionFloat(&rect, &other);
+}
+
+int ShulkerEnemy::getType() const { return 3; }
+
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y) {
     if (type == 1) return std::make_unique<BasicEnemy>(x, y);
     else if (type == 2) return std::make_unique<ZigzagEnemy>(x, y);
+    else if (type == 3) return std::make_unique<ShulkerEnemy>(x, y);
     return nullptr;
 }
