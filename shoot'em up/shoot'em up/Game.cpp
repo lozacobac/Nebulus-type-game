@@ -49,17 +49,17 @@ void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
 
     SDL_Event ev = event;
 
-    // G�rer les �v�nements de survol et de clic
+    // Gerer les evenements de survol et de clic
     handleButtonEvent(&start.startButton, &ev);
     handleButtonEvent(&start.leaveButton, &ev);
 
-    // V�rifier si le bouton Start est cliqu�
+    // Verifier si le bouton Start est clique
     if (isButtonClicked(&start.startButton, &ev)) {
         std::cout << "[INFO] Start button clicked!\n";
         shouldSwitchToCustom = true;
     }
 
-    // V�rifier si le bouton Leave est cliqu�
+    // Verifier si le bouton Leave est clique
     if (isButtonClicked(&start.leaveButton, &ev)) {
         std::cout << "[INFO] Leave button clicked!\n";
         shouldQuit = true;
@@ -116,7 +116,7 @@ int Game::run() {
             }
 
             if (currentState == State::MENU) {
-                // Traiter TOUS les �v�nements pour le menu
+                // Traiter TOUS les evenements pour le menu
                 bool shouldSwitch = false;
                 handleMenuEvent(event, shouldSwitch);
 
