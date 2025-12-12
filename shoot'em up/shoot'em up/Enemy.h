@@ -55,5 +55,14 @@ public:
     int getType() const override;
 };
 
+class DragonEnemy : public Enemy {
+
+public:
+    DragonEnemy(float px, float py);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
 
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y);

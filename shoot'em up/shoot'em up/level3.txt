@@ -1,19 +1,21 @@
-# Script pour Level2 - Shoot 'em up
-0.0 SPAWN ENEMY 400 100 3  # Spawn un ennemi shulker à x=400, y=100 au temps 0s
-2.0 SPAWN ENEMY 500 150 3  # Spawn un ennemi shulker à 2s
-5.0 SPAWN ENEMY 300 50 3   # Un autre shulker à 5s
-6.0 SPAWN ENEMY 420 150 3  # Spawn un ennemi shulker à x=420, y=150 au temps 6s
-7.0 SPAWN ENEMY 500 150 3  # Spawn un ennemi shulker à 7s
-7.0 SPAWN ENEMY 540 200 3   # Un autre shulker à 7s
-10.0 SPAWN ENEMY 200 20 3   # Un autre shulker à 10s
-13.0 SPAWN ENEMY 700 20 3   # Un autre shulker à 13s
-18.0 SPAWN ENEMY 540 55 3   # Un autre shulker à 18s
-19.0 SPAWN ENEMY 400 100 3   # Un autre shulker à 19s
-20.0 SPAWN ENEMY 120 150 3   # Un autre shulker à 20s
-30.0 SPAWN ENEMY 100 50 3   # Un autre shulker à 30s
-32.0 SPAWN ENEMY 200 50 3   # Un autre shulker à 32s
-34.0 SPAWN ENEMY 700 50 3   # Un autre shulker à 34s
-36.0 SPAWN ENEMY 400 50 3   # Un autre shulker à 36s
-40.0 SPAWN ENEMY 200 100 3   # Un autre shulker à 40s
-40.0 SPAWN ENEMY 600 100 3   # Un autre shulker à 40s
+# Script pour Level3 - Shoot 'em up
+
+0.0 SPAWN ENEMY 400 100 7  # Spawn un ennemi shulker à x=400, y=100 au temps 0s
+1.0 SPAWN ENEMY 400 0 9 
+2.0 SPAWN ENEMY 500 150 7  # Spawn un ennemi shulker à 2s
+5.0 SPAWN ENEMY 300 50 7   # Un autre shulker à 5s
+6.0 SPAWN ENEMY 420 150 7  # Spawn un ennemi shulker à x=420, y=150 au temps 6s
+7.0 SPAWN ENEMY 500 150 7  # Spawn un ennemi shulker à 7s
+7.0 SPAWN ENEMY 540 200 7   # Un autre shulker à 7s
+10.0 SPAWN ENEMY 200 20 7   # Un autre shulker à 10s
+13.0 SPAWN ENEMY 700 20 7   # Un autre shulker à 13s
+18.0 SPAWN ENEMY 540 55 7   # Un autre shulker à 18s
+19.0 SPAWN ENEMY 400 100 7   # Un autre shulker à 19s
+20.0 SPAWN ENEMY 120 150 7   # Un autre shulker à 20s
+30.0 SPAWN ENEMY 100 50 7   # Un autre shulker à 30s
+32.0 SPAWN ENEMY 200 50 7   # Un autre shulker à 32s
+34.0 SPAWN ENEMY 700 50 7   # Un autre shulker à 34s
+36.0 SPAWN ENEMY 400 50 7   # Un autre shulker à 36s
+40.0 SPAWN ENEMY 200 100 7   # Un autre shulker à 40s
+40.0 SPAWN ENEMY 600 100 7   # Un autre shulker à 40s
 60.0 END                   # Fin du niveau à 60s

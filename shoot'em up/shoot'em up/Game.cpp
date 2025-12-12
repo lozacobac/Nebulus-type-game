@@ -146,7 +146,6 @@ int Game::run() {
             if (currentLevel->isCompleted()) {
                 std::cout << "[INFO] Level completed!\n";
 
-                // Vérifier s'il y a un niveau suivant
                 if (currentLevelIndex + 1 < (int)levelsOrder.size()) {
                     // Afficher l'écran de transition
                     select.showWorldTransition(currentLevelIndex + 1);

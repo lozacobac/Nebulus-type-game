@@ -61,6 +61,11 @@ void LevelBase::handleCollisions() {
         if (pit->isPlayer) {
             for (auto eit = enemies.begin(); eit != enemies.end(); ) {
                 if ((*eit)->checkCollision(pit->rect)) {
+                    if ((*eit)->getType() == 9) {
+                        if ()
+                        levelCompleted = true;
+                        std::cout << "dragon killed";
+                    }
                     eit = enemies.erase(eit);
                     hit = true;
                     std::cout << "[INFO] Enemy destroyed!\n";
@@ -96,6 +101,7 @@ void LevelBase::handleCollisions() {
             player.projectiles.push_back(p);
         }
     }
+
 }
 
 void LevelBase::handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu) {
@@ -146,6 +152,7 @@ void LevelBase::draw(SDL_Renderer* renderer) {
 
     renderButton(renderer, &menuButton);
 }
+
 
 bool LevelBase::isCompleted() const {
     return levelCompleted;

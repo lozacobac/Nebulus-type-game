@@ -10,6 +10,7 @@ Enemy::Enemy(float px, float py) :
 {
 }
 
+
 bool Enemy::checkCollision(const SDL_FRect& other) {
     return SDL_HasRectIntersectionFloat(&rect, &other);
 }
@@ -152,12 +153,9 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
         float dy = player.y - it->y;
         float distance = sqrt(dx * dx + dy * dy);
 
-        // Distance minimale pour le guidage (en pixels)
         float minHomingDistance = 150.0f;
 
-        // Le guidage ne fonctionne que si le projectile est à plus de minHomingDistance
         if (distance > minHomingDistance) {
-            // Force de guidage (ajuste cette valeur pour plus/moins de guidage)
             float homingStrength = 100.0f;
 
             // Direction vers le joueur
@@ -189,7 +187,7 @@ void ShulkerEnemy::render(SDL_Renderer* renderer) {
 
     SDL_RenderFillRect(renderer, &rect);
 
-    // Projectiles en violet
+
     SDL_SetRenderDrawColor(renderer, 200, 0, 255, 255);
     for (auto& p : projectiles)
         SDL_RenderFillRect(renderer, &p.rect);
@@ -202,11 +200,56 @@ bool ShulkerEnemy::checkCollision(const SDL_FRect& other) {
     return SDL_HasRectIntersectionFloat(&rect, &other);
 }
 
-int ShulkerEnemy::getType() const { return 3; }
+int ShulkerEnemy::getType() const { return 7; }
+
+DragonEnemy::DragonEnemy(float px, float py) : Enemy(px, py) {
+    rect.w = 180;
+    rect.h = 250;
+}
+
+void DragonEnemy::update(float deltaTime, Player& player) {
+
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            200.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(800, 600))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void DragonEnemy::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+
+
+int DragonEnemy::getType() const { return 9; }
+
+
 
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y) {
     if (type == 1) return std::make_unique<BasicEnemy>(x, y);
     else if (type == 2) return std::make_unique<ZigzagEnemy>(x, y);
-    else if (type == 3) return std::make_unique<ShulkerEnemy>(x, y);
+    else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y);
+    else if (type == 9) return std::make_unique<DragonEnemy>(x, y);
     return nullptr;
 }
