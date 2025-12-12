@@ -18,6 +18,7 @@ Custom::Custom(SDL_Window* window)
     button = createButton(buttonX, buttonY, buttonWidth, buttonHeight, "Continue ");
     titleLabel = Label(windowWidth / 2 - 100, titleY, "Enter your name :", 1.5f);
     textbox = TextBox(textboxX, textboxY, textboxWidth, textboxHeight, 32);
+    titleLabel.setScale(2);
     titleLabel.setColor(255, 255, 255);
 }
 

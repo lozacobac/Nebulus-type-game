@@ -50,7 +50,7 @@ void BasicEnemy::render(SDL_Renderer* renderer) {
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int BasicEnemy::getType() const { return 1; }
+int BasicEnemy::getType() const { return 23; }
 
 ZigzagEnemy::ZigzagEnemy(float px, float py) : Enemy(px, py) {}
 
@@ -93,10 +93,10 @@ void ZigzagEnemy::render(SDL_Renderer* renderer) {
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int ZigzagEnemy::getType() const { return 2; }
+int ZigzagEnemy::getType() const { return 24; }
 
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y) {
-    if (type == 1) return std::make_unique<BasicEnemy>(x, y);
-    else if (type == 2) return std::make_unique<ZigzagEnemy>(x, y);
+    if (type == 23) return std::make_unique<BasicEnemy>(x, y);
+    else if (type == 24) return std::make_unique<ZigzagEnemy>(x, y);
     return nullptr;
 }

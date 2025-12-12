@@ -1,5 +1,4 @@
 #include "Button.h"
-#include <cstring>
 
 Button createButton(float x, float y, float w, float h, const char* text) {
     Button btn;
@@ -81,7 +80,9 @@ void renderButton(SDL_Renderer* renderer, Button* btn) {
     SDL_RenderRect(renderer, &btn->rect);
 
     const char* text = btn->text.c_str();
-    int charWidth = 8, charHeight = 16;
+    float scale = 0.4f;
+    int charHeight = static_cast<int>(btn->rect.h * scale);;
+    int charWidth = charHeight / 2;
     int textWidth = strlen(text) * charWidth;
 
     int textX = btn->rect.x + (btn->rect.w / 2) - (textWidth / 2);

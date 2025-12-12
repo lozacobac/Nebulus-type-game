@@ -1,10 +1,15 @@
 #include "Game.h"
-#include <iostream>
 
 bool Game::initializeSDL() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "[ERROR] SDL_Init failed: " << SDL_GetError() << "\n";
+        SDL_Quit();
         return false;
+    }
+
+    if (!TTF_Init()) {
+        std::cerr << "[ERROR] TTF_Init failed : " << SDL_GetError() << "\n";
+        SDL_Quit();
     }
     return true;
 }
@@ -63,11 +68,13 @@ int Game::run() {
         return 1;
     }
     custom = new Custom(window);
+    select = new Select(window);
 
     // Charger l'ordre des niveaux
     if (!LevelLoader::loadLevelsOrder("Levels_order.txt", levelsOrder)) {
         std::cerr << "[ERROR] Failed to load levels order\n";
         delete custom;
+        delete select;
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -109,7 +116,7 @@ int Game::run() {
                 }
                 else if (currentState == State::SELECT) {
                     int selectedLevel = 0;
-                    select.handleEvent(event, selectedLevel);
+                    select->handleEvent(event, selectedLevel);
                     if (selectedLevel >= 1 && selectedLevel <= (int)levelsOrder.size()) {
                         currentLevelIndex = selectedLevel - 1;
                         loadLevel(currentLevelIndex);
@@ -166,7 +173,7 @@ int Game::run() {
             custom->draw(renderer);
         }
         else if (currentState == State::SELECT) {
-            select.draw(renderer);
+            select->draw(renderer);
         }
         else if (currentState == State::LEVEL && currentLevel) {
             currentLevel->draw(renderer);
@@ -175,6 +182,7 @@ int Game::run() {
         SDL_RenderPresent(renderer);
     } while (keepGoing);
     delete custom;
+    delete select;
     SDL_StopTextInput(window);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
