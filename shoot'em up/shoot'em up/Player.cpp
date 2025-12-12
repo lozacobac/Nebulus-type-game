@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player() : x(400), y(500), lives(3), rect({ x, y, 32, 32 }) {}
+Player::Player() : x(400), y(500), lives(3), rect({ x, y, 32, 32 }), invicibilityTimer(0.0f) {}
 
 void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bool*
     float speed = 200.0f;
@@ -14,6 +14,11 @@ void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bo
         x = 800-rect.w;
     rect.x = x;
     rect.y = y;
+
+    //Gére le Timer d'invincibilité
+    if (invicibilityTimer > 0) {
+        invicibilityTimer -= deltaTime;
+    }
 
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
@@ -39,7 +44,12 @@ void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bo
 }
 
 void Player::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    if (isInvincible()) {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 230, 123, 209, 255);
+    }
     SDL_RenderFillRect(renderer, &rect);
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);

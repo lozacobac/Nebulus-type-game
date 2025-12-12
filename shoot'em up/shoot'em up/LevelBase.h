@@ -7,6 +7,7 @@
 #include "Projectile.h"
 #include "Button.h"
 #include "LevelLoader.h"
+#include <SDL3_ttf/SDL_ttf.h>
 
 class LevelBase {
 protected:
@@ -17,10 +18,15 @@ protected:
 
     Button menuButton;
 
+    TTF_Font* font;
+    SDL_Texture* scoreTexture;
+    SDL_FRect scoreRect;
+
     size_t currentCommand;
     Uint64 levelStartTime;
     bool levelCompleted;
     bool levelFailed;
+    int score;
 
     virtual void executeCommand(const ScriptCommand& cmd);
     void handleCollisions();
@@ -37,4 +43,5 @@ public:
 
     bool isCompleted() const;
     bool isFailed() const;
+    int getScore() const { return score; }
 };

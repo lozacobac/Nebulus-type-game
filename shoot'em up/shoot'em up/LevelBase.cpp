@@ -5,9 +5,10 @@ LevelBase::LevelBase()
     : currentCommand(0),
     levelStartTime(0),
     levelCompleted(false),
-    levelFailed(false)
+    levelFailed(false),
+    score(0)
 {
-    menuButton = createButton(10, 425.0f, 75.0f, 50.0f, "Menu");
+    menuButton = createButton(10, 480.0f, 75.0f, 50.0f, "Menu");
 }
 
 bool LevelBase::loadFromFile(const std::string& scriptPath) {
@@ -20,10 +21,12 @@ bool LevelBase::loadFromFile(const std::string& scriptPath) {
     currentCommand = 0;
     levelCompleted = false;
     levelFailed = false;
+    score = 0;
     enemies.clear();
     allProjectiles.clear();
 
     std::cout << "[INFO] Level loaded with " << script.size() << " commands\n";
+
     return true;
 }
 
@@ -61,9 +64,10 @@ void LevelBase::handleCollisions() {
         if (pit->isPlayer) {
             for (auto eit = enemies.begin(); eit != enemies.end(); ) {
                 if ((*eit)->checkCollision(pit->rect)) {
+                    score += 100;
+                    std::cout << "[Info] Enemy destroyed! Score = " << score << "\n";
                     eit = enemies.erase(eit);
                     hit = true;
-                    std::cout << "[INFO] Enemy destroyed!\n";
                     break;
                 }
                 else {
@@ -73,12 +77,15 @@ void LevelBase::handleCollisions() {
         }
         else {
             if (player.checkCollision(pit->rect)) {
-                player.lives--;
-                hit = true;
-                std::cout << "[INFO] Player hit! Lives: " << player.lives << "\n";
-                if (player.lives <= 0) {
-                    levelFailed = true;
+                if (!player.isInvincible()) {
+                    player.lives--;
+                    player.invicibilityTimer = 1.0f;
+                    std::cout << "[INFO] Player hit! Lives : " << player.lives << "\n";
+                    if (player.lives <= 0) {
+                        levelFailed = true;
+                    }
                 }
+                hit = true;
             }
         }
 
@@ -128,7 +135,7 @@ void LevelBase::update(float deltaTime) {
 }
 
 void LevelBase::draw(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, nullptr);
 
     player.render(renderer);
@@ -145,6 +152,11 @@ void LevelBase::draw(SDL_Renderer* renderer) {
     }
 
     renderButton(renderer, &menuButton);
+
+    std::string scoreText = "Score : " + std::to_string(score);
+    SDL_RenderDebugText(renderer, 10, 10, scoreText.c_str());
+    std::string livesText = "Lives : " + std::to_string(player.lives);
+    SDL_RenderDebugText(renderer, 10, 30, livesText.c_str());
 }
 
 bool LevelBase::isCompleted() const {

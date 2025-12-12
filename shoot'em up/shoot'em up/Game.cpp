@@ -68,10 +68,13 @@ void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
 
 void Game::drawMenu(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.5f, 1.0f, 1.0f);
-    SDL_RenderClear(renderer);
+    SDL_RenderFillRect(renderer, nullptr);
 
     renderButton(renderer, &start.startButton);
     renderButton(renderer, &start.leaveButton);
+
+    std::string totalScoreText = "Total Score: " + std::to_string(totalScore);
+    SDL_RenderDebugText(renderer, 700, 10, totalScoreText.c_str());
 }
 
 int Game::run() {
@@ -85,7 +88,14 @@ int Game::run() {
         return 1;
     }
 
-    if (!start.CreateWindowAndRenderer(window, renderer)) {
+    //Initialisation de ttf
+    if (!TTF_Init()) {
+        std::cerr << "[ERROR] TTF_Init failed: " << SDL_GetError() << "\n";
+        SDL_Quit();
+        return 1;
+    }
+
+    if (!CreateWindowAndRenderer(window, renderer)) {
         SDL_Quit();
         return 1;
     }
@@ -165,7 +175,9 @@ int Game::run() {
             currentLevel->update(deltaTime);
 
             if (currentLevel->isCompleted()) {
-                std::cout << "[INFO] Level completed!\n";
+                int levelScore = currentLevel->getScore();
+                totalScore += levelScore;
+                std::cout << "[INFO] Level completed! Score earned : " << levelScore << "| Total = " << totalScore << "\n";
                 currentLevelIndex++;
                 if (currentLevelIndex < (int)levelsOrder.size()) {
                     loadLevel(currentLevelIndex);
@@ -177,7 +189,8 @@ int Game::run() {
                 }
             }
             else if (currentLevel->isFailed()) {
-                std::cout << "[INFO] Level failed!\n";
+                std::cout << "[INFO] Level failed!\n" << "[INFO] Score for this run : " << totalScore << "\n";
+                totalScore = 0;
                 currentLevel = nullptr;
                 currentState = State::MENU;
             }
@@ -206,6 +219,7 @@ int Game::run() {
     SDL_StopTextInput(window);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
 
     return 0;

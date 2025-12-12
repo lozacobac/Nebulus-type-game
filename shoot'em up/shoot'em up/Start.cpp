@@ -3,8 +3,8 @@
 Start::Start()
 {
     // Initialiser les boutons du menu (coordonnées pour 640x480)
-    startButton = createButton(220, 200, 200, 50, "Start");
-    leaveButton = createButton(220, 300, 200, 50, "Leave");
+    startButton = createButton(370, 200, 200, 50, "Start");
+    leaveButton = createButton(370, 300, 200, 50, "Leave");
 }
 
 bool Start::initializeSDL()
