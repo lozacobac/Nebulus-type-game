@@ -44,5 +44,5 @@ public:
 
     bool isCompleted() const;
     bool isFailed() const;
-    int getScore() const { return score; }
+    int getScore() const;
 };

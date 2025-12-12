@@ -32,6 +32,11 @@ Select::Select(SDL_Window* window, TTF_Font* font) : font(font){
     buttonLevel4 = createButton(button4X, button4Y, button4Width, button4Height, "Level 4");
 }
 
+void Select::showWorldTransition(int worldNumber) {
+    inTransition = true;
+    currentWorld = worldNumber;
+}
+
 void Select::handleEvent(const SDL_Event& event, int& selectedLevel) {
     if (inTransition) {
         // Gerer les evenements de l'ecran de transition

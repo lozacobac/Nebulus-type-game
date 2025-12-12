@@ -2,13 +2,15 @@
 #include <iostream>
 #include "Enemy.h"
 
+
+
 LevelBase::LevelBase(TTF_Font* font)
     : currentCommand(0),
     levelStartTime(0),
     levelCompleted(false),
     levelFailed(false),
     score(0),
-    font(font)
+    font(font),
     DragonHealth(100)
 {
     menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");
@@ -189,4 +191,8 @@ bool LevelBase::isCompleted() const {
 
 bool LevelBase::isFailed() const {
     return levelFailed;
+}
+
+int LevelBase::getScore() const {
+    return score;
 }

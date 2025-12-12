@@ -204,7 +204,7 @@ int Game::run() {
 
                 if (currentLevelIndex + 1 < (int)levelsOrder.size()) {
                     // Afficher l'�cran de transition
-                    select.showWorldTransition(currentLevelIndex + 1);
+                    select->showWorldTransition(currentLevelIndex + 1);
                     currentLevel = nullptr;
                     currentState = State::SELECT;
                 }
