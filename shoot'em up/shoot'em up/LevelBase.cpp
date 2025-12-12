@@ -1,13 +1,14 @@
 #include "LevelBase.h"
 #include <iostream>
 
-LevelBase::LevelBase()
+LevelBase::LevelBase(TTF_Font* font)
     : currentCommand(0),
     levelStartTime(0),
     levelCompleted(false),
-    levelFailed(false)
+    levelFailed(false),
+    font(font)
 {
-    menuButton = createButton(10, 425.0f, 75.0f, 50.0f, "Menu");
+    menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");
 }
 
 bool LevelBase::loadFromFile(const std::string& scriptPath) {
@@ -144,7 +145,7 @@ void LevelBase::draw(SDL_Renderer* renderer) {
         }
     }
 
-    renderButton(renderer, &menuButton);
+    renderButton(renderer, &menuButton, font);
 }
 
 bool LevelBase::isCompleted() const {

@@ -1,6 +1,6 @@
 #include "Select.h"
 
-Select::Select(SDL_Window* window) {
+Select::Select(SDL_Window* window, TTF_Font* font) : font(font){
     SDL_GetWindowSize(window, &windowWidth, &windowHeight);
     margin = 20;
     // Bouton 1 : Coin supérieur gauche
@@ -56,8 +56,8 @@ void Select::draw(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColorFloat(renderer, 1.0f, 1.0f, 0.0f, 1.0f);
     SDL_RenderFillRect(renderer, nullptr);
 
-    renderButton(renderer, &buttonLevel1);
-    renderButton(renderer, &buttonLevel2);
-    renderButton(renderer, &buttonLevel3);
-    renderButton(renderer, &buttonLevel4);
+    renderButton(renderer, &buttonLevel1, font);
+    renderButton(renderer, &buttonLevel2, font);
+    renderButton(renderer, &buttonLevel3, font);
+    renderButton(renderer, &buttonLevel4, font);
 }

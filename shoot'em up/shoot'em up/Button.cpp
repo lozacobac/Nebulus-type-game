@@ -70,7 +70,7 @@ bool isButtonClicked(Button* btn, SDL_Event* e) {
     return false;
 }
 
-void renderButton(SDL_Renderer* renderer, Button* btn) {
+void renderButton(SDL_Renderer* renderer, Button* btn, TTF_Font* font) {
     SDL_Color currentColor = btn->isHovered ? btn->hoverColor : btn->color;
 
     SDL_SetRenderDrawColor(renderer, currentColor.r, currentColor.g, currentColor.b, currentColor.a);
@@ -79,14 +79,19 @@ void renderButton(SDL_Renderer* renderer, Button* btn) {
     SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
     SDL_RenderRect(renderer, &btn->rect);
 
-    const char* text = btn->text.c_str();
-    float scale = 0.4f;
-    int charHeight = static_cast<int>(btn->rect.h * scale);;
-    int charWidth = charHeight / 2;
-    int textWidth = strlen(text) * charWidth;
+    if (font && !btn->text.empty()) {
+        SDL_Surface* textSurface = TTF_RenderText_Blended(font, btn->text.c_str(), 0, btn->textColor);
+        if (textSurface) {
+            SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+            if (textTexture) {
+                float textX = btn->rect.x + (btn->rect.w - textSurface->w) / 2;
+                float textY = btn->rect.y + (btn->rect.h - textSurface->h) / 2;
 
-    int textX = btn->rect.x + (btn->rect.w / 2) - (textWidth / 2);
-    int textY = btn->rect.y + (btn->rect.h / 2) - (charHeight / 2);
-
-    SDL_RenderDebugText(renderer, textX, textY, text);
+                SDL_FRect textRect = { textX,textY,(float)textSurface->w, (float)textSurface -> h };
+                SDL_RenderTexture(renderer, textTexture, nullptr, &textRect);
+                SDL_DestroyTexture(textTexture);
+            }
+            SDL_DestroySurface(textSurface);
+        }
+    }
 }

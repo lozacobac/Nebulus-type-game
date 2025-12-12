@@ -10,6 +10,7 @@
 
 class LevelBase {
 protected:
+    TTF_Font* font;
     Player player;
     std::vector<std::unique_ptr<Enemy>> enemies;
     std::vector<Projectile> allProjectiles;
@@ -26,7 +27,8 @@ protected:
     void handleCollisions();
 
 public:
-    LevelBase();
+    LevelBase() = default;
+    LevelBase(TTF_Font* font);
     virtual ~LevelBase() = default;
 
     bool loadFromFile(const std::string& scriptPath);

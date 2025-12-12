@@ -10,10 +10,12 @@
 class Custom
 {
 public:
-    Custom(SDL_Window* window);
+    Custom(SDL_Window* window, TTF_Font* font);
     void handleEvent(const SDL_Event& event, bool& shouldSwitchToSelect);
     void update();
     void draw(SDL_Renderer* renderer);
+private:
+    TTF_Font* font;
     int windowHeight;
     int windowWidth;
     int buttonWidth;
@@ -25,7 +27,6 @@ public:
     int textboxX;
     int textboxY;
     int titleY;
-private:
     Button button;
     TextBox textbox;
     Label titleLabel;

@@ -1,6 +1,6 @@
 #include "Custom.h"
 
-Custom::Custom(SDL_Window* window)
+Custom::Custom(SDL_Window* window, TTF_Font* font) : font(font)
 {
     SDL_GetWindowSize(window, &windowWidth, &windowHeight);
     buttonWidth = windowWidth * 0.25;
@@ -42,5 +42,5 @@ void Custom::draw(SDL_Renderer* renderer) {
     titleLabel.render(renderer);
     textbox.render(renderer);
 
-    renderButton(renderer, &button);
+    renderButton(renderer, &button, font);
 }

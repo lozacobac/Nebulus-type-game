@@ -10,6 +10,7 @@ bool Game::initializeSDL() {
     if (!TTF_Init()) {
         std::cerr << "[ERROR] TTF_Init failed\n";
         SDL_Quit();
+        return false;
     }
 
     const char* fontPaths[] =
@@ -19,7 +20,7 @@ bool Game::initializeSDL() {
     };
 
     for (int i = 0; fontPaths[i] != NULL; ++i) {
-        this->font = TTF_OpenFont(fontPaths[i], 24);  // Taille initiale arbitraire
+        this->font = TTF_OpenFont(fontPaths[i], 24);
         if (this->font) {
             std::cout << "[INFO] Police chargee depuis : " << fontPaths[i] << "\n";
             break;
@@ -67,7 +68,7 @@ void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
 void Game::drawMenu(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.5f, 1.0f, 1.0f);
     SDL_RenderFillRect(renderer, nullptr);
-    renderButton(renderer, &menuButton);
+    renderButton(renderer, &menuButton, this->font);
 }
 
 int Game::run() {
@@ -85,8 +86,8 @@ int Game::run() {
         SDL_Quit();
         return 1;
     }
-    custom = new Custom(window);
-    select = new Select(window);
+    custom = new Custom(window, this->font);
+    select = new Select(window, this->font);
 
     // Charger l'ordre des niveaux
     if (!LevelLoader::loadLevelsOrder("Levels_order.txt", levelsOrder)) {
@@ -199,11 +200,19 @@ int Game::run() {
 
         SDL_RenderPresent(renderer);
     } while (keepGoing);
+
     delete custom;
     delete select;
+
+    if (this->font) {
+        TTF_CloseFont(this->font);
+        this->font = nullptr;
+    }
+
     SDL_StopTextInput(window);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
 
     return 0;
