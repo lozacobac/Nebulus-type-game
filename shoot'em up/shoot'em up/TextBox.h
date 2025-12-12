@@ -3,11 +3,12 @@
 #include <SDL3_ttf/SDL_ttf.h>
 #include <string>
 #include <algorithm>
+#include <iostream>
 
 class TextBox {
 public:
-    TextBox() = default;
-    TextBox(float x, float y, float width, float height, size_t maxLength = 32, TTF_Font* font);
+    TextBox();
+    TextBox(float x, float y, float width, float height, size_t maxLength = 32, TTF_Font* font = nullptr);
     ~TextBox();
 
     void handleEvent(const SDL_Event& e);

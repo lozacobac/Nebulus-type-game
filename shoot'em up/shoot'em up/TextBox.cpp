@@ -1,5 +1,19 @@
 #include "TextBox.h"
 
+TextBox::TextBox()
+    :m_box{ 0.0f, 0.0f, 0.0f, 0.0f },
+    m_text(""),
+    m_maxLength(32),
+    m_focused(false),
+    m_cursorVisible(true),
+    m_lastBlink(0),
+    m_cursorIBeam(nullptr),
+    m_cursorArrow(nullptr),
+    m_font(nullptr)
+{
+    std::cout << "[INFO] TextBox default constructor called\n";
+}
+
 TextBox::TextBox(float x, float y, float width, float height, size_t maxLength,TTF_Font* font)
     : m_box{ x, y, width, height }
     , m_text("")
@@ -11,6 +25,7 @@ TextBox::TextBox(float x, float y, float width, float height, size_t maxLength,T
 {
     m_cursorIBeam = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_TEXT);
     m_cursorArrow = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
+    std::cout << "[INFO] TextBox created at (" << x << ", " << y << ")\n";
 }
 
 TextBox::~TextBox() {
@@ -19,25 +34,25 @@ TextBox::~TextBox() {
 }
 
 void TextBox::handleEvent(const SDL_Event& e) {
+
+    if (e.type == SDL_EVENT_TEXT_INPUT) {
+        std::cout << "[DEBUG] Texte input received: " << e.text.text << "\n";
+    }
+
     // Gestion du clic pour focus
     bool wasFocused = m_focused;
     if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == SDL_BUTTON_LEFT) {
         float x = static_cast<float>(e.button.x);
         float y = static_cast<float>(e.button.y);
         m_focused = isPointInside(x, y);
-    }
-
-    if (m_focused && !wasFocused) {
-        SDL_StartTextInput();
-    }
-    else if () {
-
+        std::cout << "[DEBUG] TextBox focused: " << m_focused << "\n";
     }
 
     // Saisie de texte
     if (e.type == SDL_EVENT_TEXT_INPUT && m_focused) {
         if (m_text.length() < m_maxLength) {
             m_text += e.text.text;
+            std::cout << "[DEBUG] Text updated: " << m_text << "\n";
         }
     }
 
@@ -45,6 +60,7 @@ void TextBox::handleEvent(const SDL_Event& e) {
     if (e.type == SDL_EVENT_KEY_DOWN && m_focused) {
         if (e.key.scancode == SDL_SCANCODE_BACKSPACE && !m_text.empty()) {
             m_text.pop_back();
+            std::cout << "[DEBUG] Backspace pressed\n";
         }
     }
 }

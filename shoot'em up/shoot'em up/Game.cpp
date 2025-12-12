@@ -131,6 +131,9 @@ int Game::run() {
         return 1;
     }
 
+    SDL_StartTextInput(window);
+    std::cout << "[INFO] Text input started\n";
+
     bool keepGoing = true;
     Uint64 lastTime = SDL_GetTicks();
     currentLevelIndex = 0;
