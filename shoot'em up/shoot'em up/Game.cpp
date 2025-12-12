@@ -8,9 +8,27 @@ bool Game::initializeSDL() {
     }
 
     if (!TTF_Init()) {
-        std::cerr << "[ERROR] TTF_Init failed : " << SDL_GetError() << "\n";
+        std::cerr << "[ERROR] TTF_Init failed\n";
         SDL_Quit();
     }
+
+    const char* fontPaths[] =
+    {
+        "C:\\Windows\\Fonts\\arial.ttf",
+        NULL
+    };
+
+    for (int i = 0; fontPaths[i] != NULL; ++i) {
+        this->font = TTF_OpenFont(fontPaths[i], 24);  // Taille initiale arbitraire
+        if (this->font) {
+            std::cout << "[INFO] Police chargee depuis : " << fontPaths[i] << "\n";
+            break;
+        }
+        else {
+            std::cerr << "[WARNING] Echec de chargement depuis : " << fontPaths[i] << " (" << SDL_GetError() << ")\n";
+        }
+    }
+
     return true;
 }
 
