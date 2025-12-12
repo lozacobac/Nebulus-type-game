@@ -63,9 +63,10 @@ void LevelBase::handleCollisions() {
         if (pit->isPlayer) {
             for (auto eit = enemies.begin(); eit != enemies.end(); ) {
                 if ((*eit)->checkCollision(pit->rect)) {
+                    score += 100;
+                    std::cout << "[Info] Enemy destroyed! Score = " << score << "\n";
                     eit = enemies.erase(eit);
                     hit = true;
-                    std::cout << "[INFO] Enemy destroyed!\n";
                     break;
                 }
                 else {
