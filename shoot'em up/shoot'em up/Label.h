@@ -1,9 +1,11 @@
 #pragma once
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <string>
 class Label
 {
 public:
+	Label() = default;
 	Label(float x, float y, const std::string& text, float scale = 1.0f);
 
 	void render(SDL_Renderer* renderer);

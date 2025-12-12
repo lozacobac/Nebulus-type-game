@@ -5,7 +5,7 @@
 class Select
 {
 public:
-    Select();
+    Select(SDL_Window* window, TTF_Font* font);
     void handleEvent(const SDL_Event& event, int& selectedLevel);
     void draw(SDL_Renderer* renderer);
 
@@ -14,6 +14,26 @@ public:
     bool isInTransition() const { return inTransition; }
 
 private:
+    TTF_Font* font;
+    int margin;
+    int windowHeight;
+    int windowWidth;
+    float button1Width;
+    float button1Height;
+    float button1X;
+    float button1Y;
+    float button2Width;
+    float button2Height;
+    float button2X;
+    float button2Y;
+    float button3Width;
+    float button3Height;
+    float button3X;
+    float button3Y;
+    float button4Width;
+    float button4Height;
+    float button4X;
+    float button4Y;
     Button buttonLevel1;
     Button buttonLevel2;
     Button buttonLevel3;

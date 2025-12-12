@@ -1,16 +1,40 @@
 #include "Game.h"
-#include <iostream>
 
 bool Game::initializeSDL() {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         std::cerr << "[ERROR] SDL_Init failed: " << SDL_GetError() << "\n";
+        SDL_Quit();
         return false;
     }
+
+    if (!TTF_Init()) {
+        std::cerr << "[ERROR] TTF_Init failed\n";
+        SDL_Quit();
+        return false;
+    }
+
+    const char* fontPaths[] =
+    {
+        "C:\\Windows\\Fonts\\arial.ttf",
+        NULL
+    };
+
+    for (int i = 0; fontPaths[i] != NULL; ++i) {
+        this->font = TTF_OpenFont(fontPaths[i], 24);
+        if (this->font) {
+            std::cout << "[INFO] Police chargee depuis : " << fontPaths[i] << "\n";
+            break;
+        }
+        else {
+            std::cerr << "[WARNING] Echec de chargement depuis : " << fontPaths[i] << " (" << SDL_GetError() << ")\n";
+        }
+    }
+
     return true;
 }
 
 bool Game::CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer) {
-    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer) && SDL_SetRenderVSync(renderer, 1)) {
         std::cerr << "[ERROR] SDL_CreateWindowAndRenderer failed: " << SDL_GetError() << "\n";
         return false;
     }
@@ -37,30 +61,30 @@ void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
     // Debug : afficher la position de la souris
     if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
         std::cout << "[DEBUG] Mouse click at: " << event.button.x << ", " << event.button.y << "\n";
-        std::cout << "[DEBUG] Start button: x=" << start.startButton.rect.x
-            << " y=" << start.startButton.rect.y
-            << " w=" << start.startButton.rect.w
-            << " h=" << start.startButton.rect.h << "\n";
-        std::cout << "[DEBUG] Leave button: x=" << start.leaveButton.rect.x
-            << " y=" << start.leaveButton.rect.y
-            << " w=" << start.leaveButton.rect.w
-            << " h=" << start.leaveButton.rect.h << "\n";
+        std::cout << "[DEBUG] Start button: x=" << start->startButton.rect.x
+            << " y=" << start->startButton.rect.y
+            << " w=" << start->startButton.rect.w
+            << " h=" << start->startButton.rect.h << "\n";
+        std::cout << "[DEBUG] Leave button: x=" << start->leaveButton.rect.x
+            << " y=" << start->leaveButton.rect.y
+            << " w=" << start->leaveButton.rect.w
+            << " h=" << start->leaveButton.rect.h << "\n";
     }
 
     SDL_Event ev = event;
 
     // Gerer les evenements de survol et de clic
-    handleButtonEvent(&start.startButton, &ev);
-    handleButtonEvent(&start.leaveButton, &ev);
+    handleButtonEvent(&start->startButton, &ev);
+    handleButtonEvent(&start->leaveButton, &ev);
 
     // Verifier si le bouton Start est clique
-    if (isButtonClicked(&start.startButton, &ev)) {
+    if (isButtonClicked(&start->startButton, &ev)) {
         std::cout << "[INFO] Start button clicked!\n";
         shouldSwitchToCustom = true;
     }
 
     // Verifier si le bouton Leave est clique
-    if (isButtonClicked(&start.leaveButton, &ev)) {
+    if (isButtonClicked(&start->leaveButton, &ev)) {
         std::cout << "[INFO] Leave button clicked!\n";
         shouldQuit = true;
     }
@@ -70,8 +94,8 @@ void Game::drawMenu(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.5f, 1.0f, 1.0f);
     SDL_RenderFillRect(renderer, nullptr);
 
-    renderButton(renderer, &start.startButton);
-    renderButton(renderer, &start.leaveButton);
+    renderButton(renderer, &start->startButton);
+    renderButton(renderer, &start->leaveButton);
 
     std::string totalScoreText = "Total Score: " + std::to_string(totalScore);
     SDL_RenderDebugText(renderer, 700, 10, totalScoreText.c_str());
@@ -99,10 +123,15 @@ int Game::run() {
         SDL_Quit();
         return 1;
     }
+    custom = new Custom(window, this->font);
+    select = new Select(window, this->font);
+    start = new Start(window, this->font);
 
     // Charger l'ordre des niveaux
     if (!LevelLoader::loadLevelsOrder("Levels_order.txt", levelsOrder)) {
         std::cerr << "[ERROR] Failed to load levels order\n";
+        delete custom;
+        delete select;
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -169,7 +198,7 @@ int Game::run() {
 
         // Update
         if (currentState == State::CUSTOM) {
-            custom.update();
+            custom->update();
         }
         else if (currentState == State::LEVEL && currentLevel) {
             currentLevel->update(deltaTime);
@@ -204,10 +233,10 @@ int Game::run() {
             drawMenu(renderer);
         }
         else if (currentState == State::CUSTOM) {
-            custom.draw(renderer);
+            custom->draw(renderer);
         }
         else if (currentState == State::SELECT) {
-            select.draw(renderer);
+            select->draw(renderer);
         }
         else if (currentState == State::LEVEL && currentLevel) {
             currentLevel->draw(renderer);
@@ -215,6 +244,14 @@ int Game::run() {
 
         SDL_RenderPresent(renderer);
     } while (keepGoing);
+
+    delete custom;
+    delete select;
+
+    if (this->font) {
+        TTF_CloseFont(this->font);
+        this->font = nullptr;
+    }
 
     SDL_StopTextInput(window);
     SDL_DestroyRenderer(renderer);

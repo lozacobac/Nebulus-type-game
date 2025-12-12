@@ -4,6 +4,7 @@
 
 class TextBox {
 public:
+    TextBox() = default;
     TextBox(float x, float y, float width, float height, size_t maxLength = 32);
     ~TextBox();
 
