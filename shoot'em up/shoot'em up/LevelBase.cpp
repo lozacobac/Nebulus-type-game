@@ -1,5 +1,6 @@
 #include "LevelBase.h"
 #include <iostream>
+#include "Enemy.h"
 
 LevelBase::LevelBase()
     : currentCommand(0),
@@ -62,7 +63,7 @@ void LevelBase::handleCollisions() {
             for (auto eit = enemies.begin(); eit != enemies.end(); ) {
                 if ((*eit)->checkCollision(pit->rect)) {
                     if ((*eit)->getType() == 9) {
-                        if ()
+                        
                         levelCompleted = true;
                         std::cout << "dragon killed";
                     }
