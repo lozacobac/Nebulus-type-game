@@ -1,6 +1,6 @@
 #include "Select.h"
 
-Select::Select(SDL_Window* window, TTF_Font* font) : font(font){
+Select::Select(SDL_Window* window, TTF_Font* font) : font(font), inTransition(false) {
     SDL_GetWindowSize(window, &windowWidth, &windowHeight);
     margin = 20;
     // Bouton 1 : Coin sup�rieur gauche
@@ -30,6 +30,9 @@ Select::Select(SDL_Window* window, TTF_Font* font) : font(font){
     button4X = windowWidth - button4Width - margin;
     button4Y = button2Height + margin*2;
     buttonLevel4 = createButton(button4X, button4Y, button4Width, button4Height, "Level 4");
+
+    buttonBackToMenu = createButton(170, 300, 120, 50, "Menu");
+    buttonNextWorld = createButton(350, 300, 120, 50, "Next World");
 }
 
 void Select::showWorldTransition(int worldNumber) {
