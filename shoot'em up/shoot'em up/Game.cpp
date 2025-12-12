@@ -10,7 +10,7 @@ bool Game::initializeSDL() {
 }
 
 bool Game::CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer) {
-    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer) && SDL_SetRenderVSync(renderer, 1)) {
         std::cerr << "[ERROR] SDL_CreateWindowAndRenderer failed: " << SDL_GetError() << "\n";
         return false;
     }
@@ -62,10 +62,12 @@ int Game::run() {
         SDL_Quit();
         return 1;
     }
+    custom = new Custom(window);
 
     // Charger l'ordre des niveaux
     if (!LevelLoader::loadLevelsOrder("Levels_order.txt", levelsOrder)) {
         std::cerr << "[ERROR] Failed to load levels order\n";
+        delete custom;
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
@@ -100,7 +102,7 @@ int Game::run() {
                 }
                 else if (currentState == State::CUSTOM) {
                     bool shouldSwitch = false;
-                    custom.handleEvent(event, shouldSwitch);
+                    custom->handleEvent(event, shouldSwitch);
                     if (shouldSwitch) {
                         currentState = State::SELECT;
                     }
@@ -129,7 +131,7 @@ int Game::run() {
 
         // Update
         if (currentState == State::CUSTOM) {
-            custom.update();
+            custom->update();
         }
         else if (currentState == State::LEVEL && currentLevel) {
             currentLevel->update(deltaTime);
@@ -161,7 +163,7 @@ int Game::run() {
             drawMenu(renderer);
         }
         else if (currentState == State::CUSTOM) {
-            custom.draw(renderer);
+            custom->draw(renderer);
         }
         else if (currentState == State::SELECT) {
             select.draw(renderer);
@@ -172,7 +174,7 @@ int Game::run() {
 
         SDL_RenderPresent(renderer);
     } while (keepGoing);
-
+    delete custom;
     SDL_StopTextInput(window);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

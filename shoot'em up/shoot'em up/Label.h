@@ -4,6 +4,7 @@
 class Label
 {
 public:
+	Label() = default;
 	Label(float x, float y, const std::string& text, float scale = 1.0f);
 
 	void render(SDL_Renderer* renderer);

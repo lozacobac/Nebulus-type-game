@@ -13,11 +13,12 @@
 class Game
 {
 public:
+    Game() = default;
     int run();
 
 private:
     Select select;
-    Custom custom;
+    Custom* custom = nullptr;
     std::vector<std::string> levelsOrder;
     int currentLevelIndex;
     std::unique_ptr<LevelBase> currentLevel;

@@ -1,11 +1,24 @@
 #include "Custom.h"
 
-Custom::Custom()
-    : button(createButton(220, 200, 200, 50, "Continue"))// x , y , h , w , text
-    , titleLabel(30, 50, "Entrez votre nom:", 1.5f)
-    , textbox(30, 75, 400, 40, 32)
+Custom::Custom(SDL_Window* window)
 {
-    titleLabel.setColor(255, 255, 255);  // Blanc
+    SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+    buttonWidth = windowWidth * 0.25;
+    buttonHeight = 50;
+    buttonX = (windowWidth - buttonWidth) / 2;
+    buttonY = windowHeight * 0.6;
+
+    textboxWidth = windowWidth * 0.5;
+    textboxHeight = 40;
+    textboxX = (windowWidth - textboxWidth) / 2;
+    textboxY = windowHeight * 0.4;
+
+    titleY = textboxY - 60;
+
+    button = createButton(buttonX, buttonY, buttonWidth, buttonHeight, "Continue ");
+    titleLabel = Label(windowWidth / 2 - 100, titleY, "Enter your name :", 1.5f);
+    textbox = TextBox(textboxX, textboxY, textboxWidth, textboxHeight, 32);
+    titleLabel.setColor(255, 255, 255);
 }
 
 void Custom::handleEvent(const SDL_Event& event, bool& shouldSwitchToSelect) {
