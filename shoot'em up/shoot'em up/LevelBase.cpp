@@ -6,7 +6,8 @@ LevelBase::LevelBase()
     : currentCommand(0),
     levelStartTime(0),
     levelCompleted(false),
-    levelFailed(false)
+    levelFailed(false),
+    DragonHealth(100)
 {
     menuButton = createButton(10, 425.0f, 75.0f, 50.0f, "Menu");
 }
@@ -55,22 +56,32 @@ void LevelBase::handleCollisions() {
             allProjectiles.push_back(p);
         }
     }
-
     for (auto pit = allProjectiles.begin(); pit != allProjectiles.end(); ) {
         bool hit = false;
 
         if (pit->isPlayer) {
+
             for (auto eit = enemies.begin(); eit != enemies.end(); ) {
                 if ((*eit)->checkCollision(pit->rect)) {
                     if ((*eit)->getType() == 9) {
-                        
-                        levelCompleted = true;
-                        std::cout << "dragon killed";
+                        DragonHealth--;
+                        std::cout << "Dragon a été toucher" << DragonHealth;
+                        hit = true;
+                        if (DragonHealth <= 0) {
+                            levelCompleted = true;
+                            std::cout << "dragon killed";
+                            eit = enemies.erase(eit);
+                            break;
+                        }
+                        break;
                     }
-                    eit = enemies.erase(eit);
-                    hit = true;
-                    std::cout << "[INFO] Enemy destroyed!\n";
-                    break;
+                    else {
+                        eit = enemies.erase(eit);
+                        hit = true;
+                        std::cout << "[INFO] Enemy destroyed!\n";
+                        break;
+                    }
+                    
                 }
                 else {
                     ++eit;

@@ -59,7 +59,15 @@ class DragonEnemy : public Enemy {
 
 public:
     DragonEnemy(float px, float py);
-    int health = 100;
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
+class Enderman : public Enemy {
+
+public:
+    Enderman(float px, float py);
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType() const override;

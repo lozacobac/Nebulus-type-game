@@ -214,10 +214,55 @@ void DragonEnemy::update(float deltaTime, Player& player) {
     shotTimer += deltaTime;
     if (shotTimer >= 2.0f) {
         projectiles.push_back({
-            x + 12,
-            y + 32,
+            x + 80,
+            y + 250,
             0,
-            200.0f,
+            300.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 100,
+            y + 250,
+            0,
+            300.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 0,
+            y + 250,
+            0,
+            500.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 10,
+            y + 250,
+            0,
+            500.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 180,
+            y + 250,
+            0,
+            500.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 170,
+            y + 250,
+            0,
+            500.0f,
             false,
             {x + rect.w / 2 - 4,y + rect.h,8,8}
             });
@@ -240,9 +285,23 @@ void DragonEnemy::render(SDL_Renderer* renderer) {
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-
-
 int DragonEnemy::getType() const { return 9; }
+
+Enderman::Enderman(float px, float py) : Enemy(px, py) {}
+
+void Enderman::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+}
+
+void Enderman::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 255, 30, 90, 160);
+    SDL_RenderFillRect(renderer, &rect);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int Enderman::getType() const { return 8; }
 
 
 
@@ -250,6 +309,7 @@ std::unique_ptr<Enemy> createEnemy(int type, float x, float y) {
     if (type == 1) return std::make_unique<BasicEnemy>(x, y);
     else if (type == 2) return std::make_unique<ZigzagEnemy>(x, y);
     else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y);
+    else if (type == 8) return std::make_unique<Enderman>(x, y);
     else if (type == 9) return std::make_unique<DragonEnemy>(x, y);
     return nullptr;
 }

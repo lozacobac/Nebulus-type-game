@@ -30,7 +30,7 @@ public:
     virtual ~LevelBase() = default;
 
     bool loadFromFile(const std::string& scriptPath);
-
+    int DragonHealth;
     virtual void handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu);
     virtual void update(float deltaTime);
     virtual void draw(SDL_Renderer* renderer);
