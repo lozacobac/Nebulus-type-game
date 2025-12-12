@@ -200,14 +200,16 @@ int Game::run() {
             currentLevel->update(deltaTime);
 
             if (currentLevel->isCompleted()) {
-                int levelScore = currentLevel->getScore();
-                totalScore += levelScore;
-                std::cout << "[INFO] Level completed! Score earned : " << levelScore << "| Total = " << totalScore << "\n";
-                currentLevelIndex++;
-                if (currentLevelIndex < (int)levelsOrder.size()) {
-                    loadLevel(currentLevelIndex);
+                std::cout << "[INFO] Level completed!\n";
+
+                if (currentLevelIndex + 1 < (int)levelsOrder.size()) {
+                    // Afficher l'�cran de transition
+                    select.showWorldTransition(currentLevelIndex + 1);
+                    currentLevel = nullptr;
+                    currentState = State::SELECT;
                 }
                 else {
+                    // Tous les niveaux sont termin�s
                     std::cout << "[INFO] All levels completed!\n";
                     currentLevel = nullptr;
                     currentState = State::MENU;

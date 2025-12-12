@@ -42,4 +42,35 @@ public:
     int getType() const override;
 };
 
+class ShulkerEnemy : public Enemy {
+private:
+    float invulnerabilityTimer;
+    bool isInvulnerable;
+public:
+    ShulkerEnemy(float px, float py);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    bool checkCollision(const SDL_FRect& other) override;
+    int getType() const override;
+};
+
+class DragonEnemy : public Enemy {
+
+public:
+    DragonEnemy(float px, float py);
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
+class Enderman : public Enemy {
+
+public:
+    Enderman(float px, float py);
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y);

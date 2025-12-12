@@ -1,5 +1,6 @@
 #include "LevelBase.h"
 #include <iostream>
+#include "Enemy.h"
 
 LevelBase::LevelBase(TTF_Font* font)
     : currentCommand(0),
@@ -8,6 +9,7 @@ LevelBase::LevelBase(TTF_Font* font)
     levelFailed(false),
     score(0),
     font(font)
+    DragonHealth(100)
 {
     menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");
 }
@@ -58,11 +60,11 @@ void LevelBase::handleCollisions() {
             allProjectiles.push_back(p);
         }
     }
-
     for (auto pit = allProjectiles.begin(); pit != allProjectiles.end(); ) {
         bool hit = false;
 
         if (pit->isPlayer) {
+
             for (auto eit = enemies.begin(); eit != enemies.end(); ) {
                 if ((*eit)->checkCollision(pit->rect)) {
                     score += 100;
@@ -70,6 +72,25 @@ void LevelBase::handleCollisions() {
                     eit = enemies.erase(eit);
                     hit = true;
                     break;
+                    if ((*eit)->getType() == 9) {
+                        DragonHealth--;
+                        std::cout << "Dragon a �t� toucher" << DragonHealth;
+                        hit = true;
+                        if (DragonHealth <= 0) {
+                            levelCompleted = true;
+                            std::cout << "dragon killed";
+                            eit = enemies.erase(eit);
+                            break;
+                        }
+                        break;
+                    }
+                    else {
+                        eit = enemies.erase(eit);
+                        hit = true;
+                        std::cout << "[INFO] Enemy destroyed!\n";
+                        break;
+                    }
+                    
                 }
                 else {
                     ++eit;
@@ -104,6 +125,7 @@ void LevelBase::handleCollisions() {
             player.projectiles.push_back(p);
         }
     }
+
 }
 
 void LevelBase::handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu) {
@@ -159,6 +181,7 @@ void LevelBase::draw(SDL_Renderer* renderer) {
     std::string livesText = "Lives : " + std::to_string(player.lives);
     SDL_RenderDebugText(renderer, 10, 30, livesText.c_str());
 }
+
 
 bool LevelBase::isCompleted() const {
     return levelCompleted;

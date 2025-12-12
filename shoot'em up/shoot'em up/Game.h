@@ -16,7 +16,6 @@ class Game
 public:
     Game() = default;
     int run();
-
 private:
     Start* start=nullptr;
     Select* select = nullptr;
@@ -29,14 +28,12 @@ private:
 
     enum class State { MENU, CUSTOM, SELECT, LEVEL };
     State currentState;
-
     Button menuButton;
     TTF_Font* font = nullptr;
 
     void loadLevel(int index);
     void handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom);
     void drawMenu(SDL_Renderer* renderer);
-
     bool initializeSDL();
     bool CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer);
 };
