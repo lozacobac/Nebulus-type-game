@@ -1,6 +1,5 @@
 #pragma once
 #include <SDL3/SDL.h>
-#include <SDL3_ttf/SDL_ttf.h>
 #include <memory>
 #include <vector>
 #include <string>
@@ -30,6 +29,7 @@ private:
     State currentState;
 
     Button menuButton;
+    TTF_Font* font = nullptr;
 
     void loadLevel(int index);
     void handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom);

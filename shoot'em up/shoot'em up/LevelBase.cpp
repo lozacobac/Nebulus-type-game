@@ -26,6 +26,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath) {
     allProjectiles.clear();
 
     std::cout << "[INFO] Level loaded with " << script.size() << " commands\n";
+
     return true;
 }
 
@@ -134,7 +135,7 @@ void LevelBase::update(float deltaTime) {
 }
 
 void LevelBase::draw(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, nullptr);
 
     player.render(renderer);
@@ -151,6 +152,11 @@ void LevelBase::draw(SDL_Renderer* renderer) {
     }
 
     renderButton(renderer, &menuButton);
+
+    std::string scoreText = "Score : " + std::to_string(score);
+    SDL_RenderDebugText(renderer, 10, 10, scoreText.c_str());
+    std::string livesText = "Lives : " + std::to_string(player.lives);
+    SDL_RenderDebugText(renderer, 10, 30, livesText.c_str());
 }
 
 bool LevelBase::isCompleted() const {

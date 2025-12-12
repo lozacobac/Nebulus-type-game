@@ -7,6 +7,7 @@
 #include "Projectile.h"
 #include "Button.h"
 #include "LevelLoader.h"
+#include <SDL3_ttf/SDL_ttf.h>
 
 class LevelBase {
 protected:
@@ -16,6 +17,10 @@ protected:
     std::vector<ScriptCommand> script;
 
     Button menuButton;
+
+    TTF_Font* font;
+    SDL_Texture* scoreTexture;
+    SDL_FRect scoreRect;
 
     size_t currentCommand;
     Uint64 levelStartTime;
