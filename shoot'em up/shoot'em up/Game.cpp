@@ -10,7 +10,7 @@ bool Game::initializeSDL() {
 }
 
 bool Game::CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer) {
-    if (!SDL_CreateWindowAndRenderer("AeroBlade", 960, 540, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer)) {
         std::cerr << "[ERROR] SDL_CreateWindowAndRenderer failed: " << SDL_GetError() << "\n";
         return false;
     }
@@ -49,17 +49,17 @@ void Game::handleMenuEvent(const SDL_Event& event, bool& shouldSwitchToCustom) {
 
     SDL_Event ev = event;
 
-    // Gérer les événements de survol et de clic
+    // Gï¿½rer les ï¿½vï¿½nements de survol et de clic
     handleButtonEvent(&start.startButton, &ev);
     handleButtonEvent(&start.leaveButton, &ev);
 
-    // Vérifier si le bouton Start est cliqué
+    // Vï¿½rifier si le bouton Start est cliquï¿½
     if (isButtonClicked(&start.startButton, &ev)) {
         std::cout << "[INFO] Start button clicked!\n";
         shouldSwitchToCustom = true;
     }
 
-    // Vérifier si le bouton Leave est cliqué
+    // Vï¿½rifier si le bouton Leave est cliquï¿½
     if (isButtonClicked(&start.leaveButton, &ev)) {
         std::cout << "[INFO] Leave button clicked!\n";
         shouldQuit = true;
@@ -116,11 +116,11 @@ int Game::run() {
             }
 
             if (currentState == State::MENU) {
-                // Traiter TOUS les événements pour le menu
+                // Traiter TOUS les ï¿½vï¿½nements pour le menu
                 bool shouldSwitch = false;
                 handleMenuEvent(event, shouldSwitch);
 
-                // Vérifier si on doit quitter
+                // Vï¿½rifier si on doit quitter
                 if (shouldQuit) {
                     keepGoing = false;
                 }
