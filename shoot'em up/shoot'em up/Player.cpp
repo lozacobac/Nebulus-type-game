@@ -1,6 +1,6 @@
 #include "Player.h"
 
-Player::Player() : x(400), y(500), lives(100), rect({ x, y, 32, 32 }), invicibilityTimer(0.0f) {}
+Player::Player() : x(400), y(500), lives(3), rect({ x, y, 32, 32 }), invicibilityTimer(0.0f) {}
 
 void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bool*
     float speed = 200.0f;
