@@ -1,13 +1,14 @@
 #include "Enemy.h"
 #include "Player.h"
 
-Enemy::Enemy(float px, float py) : 
-    x(px), 
-    y(py), 
-    rect({ x, y, 32, 32 }), 
+Enemy::Enemy(float px, float py) :
+    x(px),
+    y(py),
+    rect({ x, y, 32, 32 }),
     moveTimer(0.0f),
     shotTimer(0.0f)
-{}
+{
+}
 
 bool Enemy::checkCollision(const SDL_FRect& other) {
     return SDL_HasRectIntersectionFloat(&rect, &other);
@@ -23,14 +24,14 @@ void BasicEnemy::update(float deltaTime, Player& player) {
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
     if (shotTimer >= 2.0f) {
-        projectiles.push_back({ 
-            x + 12, 
-            y + 32, 
-            0, 
-            200.0f, 
-            false, 
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            200.0f,
+            false,
             {x + rect.w / 2 - 4,y + rect.h,8,8}
-        });
+            });
         shotTimer = 0.0f;
     }
     for (auto it = projectiles.begin();
@@ -63,9 +64,9 @@ void ZigzagEnemy::update(float deltaTime, Player& player) {
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
     if (shotTimer >= 1.0f) {
-        projectiles.push_back({ 
-            x + 12, 
-            y + 32, 
+        projectiles.push_back({
+            x + 12,
+            y + 32,
             0,
             250.0f,
             false,
@@ -98,7 +99,7 @@ int ZigzagEnemy::getType() const { return 2; }
 ShulkerEnemy::ShulkerEnemy(float px, float py)
     : Enemy(px, py),
     invulnerabilityTimer(0.0f),
-    isInvulnerable(false)  // Commence vulnérable
+    isInvulnerable(false)
 {
 }
 
@@ -110,65 +111,94 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
     // Gestion du cycle d'invulnérabilité
     invulnerabilityTimer += deltaTime;
 
-    // Cycle de 3 secondes : 2s vulnérable, 2s invulnérable
     if (invulnerabilityTimer < 2.0f) {
-        isInvulnerable = false;  // 0-1s : Vulnérable
+        isInvulnerable = false;
     }
     else if (invulnerabilityTimer < 4.0f) {
-        isInvulnerable = true;   // 1-4s : Invulnérable
+        isInvulnerable = true;
     }
     else {
-        invulnerabilityTimer = 0.0f;  // Recommence le cycle
+        invulnerabilityTimer = 0.0f;
     }
 
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
     if (shotTimer >= 5.0f) {
+        // Calcul de la direction vers le joueur
+        float dx = player.x - x;
+        float dy = player.y - y;
+        float distance = sqrt(dx * dx + dy * dy);
+
+        // Normalisation et application de la vitesse
+        float speed = 150.0f;
+        float vx = (dx / distance) * speed;
+        float vy = (dy / distance) * speed;
+
         projectiles.push_back({
-            x + 12,
-            y + 32,
-            0,
-            100.0f,
+            x + rect.w / 2 - 4,
+            y + rect.h,
+            vx,  // Vitesse en X vers le joueur
+            vy,  // Vitesse en Y vers le joueur
             false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            {x + rect.w / 2 - 4, y + rect.h, 8, 8}
             });
         shotTimer = 0.0f;
     }
-    for (auto it = projectiles.begin();
-        it != projectiles.end(); ) {
+
+    // Mise à jour des projectiles avec guidage
+    for (auto it = projectiles.begin(); it != projectiles.end(); ) {
+        // Guidage vers le joueur
+        float dx = player.x - it->x;
+        float dy = player.y - it->y;
+        float distance = sqrt(dx * dx + dy * dy);
+
+        // Distance minimale pour le guidage (en pixels)
+        float minHomingDistance = 150.0f;
+
+        // Le guidage ne fonctionne que si le projectile est à plus de minHomingDistance
+        if (distance > minHomingDistance) {
+            // Force de guidage (ajuste cette valeur pour plus/moins de guidage)
+            float homingStrength = 100.0f;
+
+            // Direction vers le joueur
+            float targetVx = (dx / distance) * 150.0f;
+            float targetVy = (dy / distance) * 150.0f;
+
+            // Interpolation vers la direction cible
+            it->vx += (targetVx - it->vx) * homingStrength * deltaTime / 150.0f;
+            it->vy += (targetVy - it->vy) * homingStrength * deltaTime / 150.0f;
+        }
+        // Sinon, le projectile continue en ligne droite
 
         it->update(deltaTime);
+
         if (it->isOffScreen(800, 600))
             it = projectiles.erase(it);
-        else ++it;
+        else
+            ++it;
     }
 }
 
 void ShulkerEnemy::render(SDL_Renderer* renderer) {
-    // Change de couleur selon l'état
     if (isInvulnerable) {
-        // Gris foncé quand invulnérable (comme une coquille fermée)
         SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
     }
     else {
-        // Jaune-vert quand vulnérable (comme une coquille ouverte)
         SDL_SetRenderDrawColor(renderer, 100, 100, 0, 255);
     }
 
     SDL_RenderFillRect(renderer, &rect);
 
-    // Dessiner les projectiles
-    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    // Projectiles en violet
+    SDL_SetRenderDrawColor(renderer, 200, 0, 255, 255);
     for (auto& p : projectiles)
         SDL_RenderFillRect(renderer, &p.rect);
 }
 
 bool ShulkerEnemy::checkCollision(const SDL_FRect& other) {
-    // Si invulnérable, ignore les collisions
     if (isInvulnerable) {
         return false;
     }
-    // Sinon, collision normale
     return SDL_HasRectIntersectionFloat(&rect, &other);
 }
 
