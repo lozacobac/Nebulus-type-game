@@ -1,11 +1,13 @@
 #pragma once
 #include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <string>
+#include <algorithm>
 
 class TextBox {
 public:
     TextBox() = default;
-    TextBox(float x, float y, float width, float height, size_t maxLength = 32);
+    TextBox(float x, float y, float width, float height, size_t maxLength = 32, TTF_Font* font);
     ~TextBox();
 
     void handleEvent(const SDL_Event& e);
@@ -31,6 +33,8 @@ private:
 
     SDL_Cursor* m_cursorIBeam;
     SDL_Cursor* m_cursorArrow;
+    
+    TTF_Font* m_font;
 
     bool isPointInside(float x, float y) const;
     void updateCursor(SDL_Renderer* renderer);

@@ -78,8 +78,8 @@ void Select::draw(SDL_Renderer* renderer) {
         SDL_RenderFillRect(renderer, nullptr);
 
         // Pour l'instant, on dessine juste les boutons
-        renderButton(renderer, &buttonBackToMenu);
-        renderButton(renderer, &buttonNextWorld);
+        renderButton(renderer, &buttonBackToMenu, font);
+        renderButton(renderer, &buttonNextWorld, font);
     }
     else {
         // Dessiner l'ecran de selection normal

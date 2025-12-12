@@ -6,7 +6,7 @@ LevelBase::LevelBase(TTF_Font* font)
     levelStartTime(0),
     levelCompleted(false),
     levelFailed(false),
-    score(0)
+    score(0),
     font(font)
 {
     menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");

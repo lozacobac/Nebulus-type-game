@@ -1,12 +1,13 @@
 #include "TextBox.h"
-#include <algorithm>
 
-TextBox::TextBox(float x, float y, float width, float height, size_t maxLength)
+TextBox::TextBox(float x, float y, float width, float height, size_t maxLength,TTF_Font* font)
     : m_box{ x, y, width, height }
+    , m_text("")
     , m_maxLength(maxLength)
     , m_focused(false)
     , m_cursorVisible(true)
     , m_lastBlink(0)
+    , m_font(font)
 {
     m_cursorIBeam = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_TEXT);
     m_cursorArrow = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_DEFAULT);
@@ -19,10 +20,18 @@ TextBox::~TextBox() {
 
 void TextBox::handleEvent(const SDL_Event& e) {
     // Gestion du clic pour focus
+    bool wasFocused = m_focused;
     if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == SDL_BUTTON_LEFT) {
         float x = static_cast<float>(e.button.x);
         float y = static_cast<float>(e.button.y);
         m_focused = isPointInside(x, y);
+    }
+
+    if (m_focused && !wasFocused) {
+        SDL_StartTextInput();
+    }
+    else if () {
+
     }
 
     // Saisie de texte

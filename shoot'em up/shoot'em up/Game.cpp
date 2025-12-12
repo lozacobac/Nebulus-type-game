@@ -94,8 +94,8 @@ void Game::drawMenu(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColorFloat(renderer, 0.0f, 0.5f, 1.0f, 1.0f);
     SDL_RenderFillRect(renderer, nullptr);
 
-    renderButton(renderer, &start->startButton);
-    renderButton(renderer, &start->leaveButton);
+    renderButton(renderer, &start->startButton, font);
+    renderButton(renderer, &start->leaveButton, font);
 
     std::string totalScoreText = "Total Score: " + std::to_string(totalScore);
     SDL_RenderDebugText(renderer, 700, 10, totalScoreText.c_str());
@@ -107,14 +107,7 @@ int Game::run() {
 
     SDL_SetAppMetadata("AeroBlade", "1.0", "games.anakata.test-sdl");
 
-    if (!start.initializeSDL()) {
-        SDL_Quit();
-        return 1;
-    }
-
-    //Initialisation de ttf
-    if (!TTF_Init()) {
-        std::cerr << "[ERROR] TTF_Init failed: " << SDL_GetError() << "\n";
+    if (!this->initializeSDL()) {
         SDL_Quit();
         return 1;
     }
@@ -125,7 +118,7 @@ int Game::run() {
     }
     custom = new Custom(window, this->font);
     select = new Select(window, this->font);
-    start = new Start(window, this->font);
+    start = new Start();
 
     // Charger l'ordre des niveaux
     if (!LevelLoader::loadLevelsOrder("Levels_order.txt", levelsOrder)) {
@@ -170,14 +163,14 @@ int Game::run() {
             }
             else if (currentState == State::CUSTOM) {
                 bool shouldSwitch = false;
-                custom.handleEvent(event, shouldSwitch);
+                custom->handleEvent(event, shouldSwitch);
                 if (shouldSwitch) {
                     currentState = State::SELECT;
                 }
             }
             else if (currentState == State::SELECT) {
                 int selectedLevel = 0;
-                select.handleEvent(event, selectedLevel);
+                select->handleEvent(event, selectedLevel);
                 if (selectedLevel >= 1 && selectedLevel <= (int)levelsOrder.size()) {
                     currentLevelIndex = selectedLevel - 1;
                     loadLevel(currentLevelIndex);

@@ -19,7 +19,6 @@ protected:
 
     Button menuButton;
 
-    TTF_Font* font;
     SDL_Texture* scoreTexture;
     SDL_FRect scoreRect;
 

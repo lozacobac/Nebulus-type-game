@@ -16,7 +16,6 @@ class Game
 public:
     Game() = default;
     int run();
-    TTF_Font* font = nullptr;
 
 private:
     Start* start=nullptr;
