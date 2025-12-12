@@ -109,7 +109,6 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
     rect.x = x;
     rect.y = y;
 
-    // Gestion du cycle d'invulnérabilité
     invulnerabilityTimer += deltaTime;
 
     if (invulnerabilityTimer < 2.0f) {
@@ -138,8 +137,8 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
         projectiles.push_back({
             x + rect.w / 2 - 4,
             y + rect.h,
-            vx,  // Vitesse en X vers le joueur
-            vy,  // Vitesse en Y vers le joueur
+            vx,
+            vy,
             false,
             {x + rect.w / 2 - 4, y + rect.h, 8, 8}
             });
