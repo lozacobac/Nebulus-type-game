@@ -2,7 +2,10 @@
 #include <SDL3/SDL.h>
 struct Projectile
 {
-	float x, y, vx, vy;
+	float x;
+	float y;
+	float vx;
+	float vy;
 	bool isPlayer;
 	SDL_FRect rect;
 
