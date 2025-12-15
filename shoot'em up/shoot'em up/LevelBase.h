@@ -28,12 +28,15 @@ protected:
     bool levelFailed;
     int score;
 
+    int screenWidth;
+    int screenHeight;
+
     virtual void executeCommand(const ScriptCommand& cmd);
     void handleCollisions();
 
 public:
     LevelBase() = default;
-    LevelBase(TTF_Font* font);
+    LevelBase(TTF_Font* font, int width, int height);
     virtual ~LevelBase() = default;
 
     bool loadFromFile(const std::string& scriptPath);

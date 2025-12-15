@@ -4,14 +4,18 @@
 
 
 
-LevelBase::LevelBase(TTF_Font* font)
+LevelBase::LevelBase(TTF_Font* font,int width, int height)
     : currentCommand(0),
     levelStartTime(0),
     levelCompleted(false),
     levelFailed(false),
     score(0),
     font(font),
-    DragonHealth(100)
+    DragonHealth(100),
+    screenWidth(width),
+    screenHeight(height),
+    scoreTexture(nullptr),
+    player(width,height)
 {
     menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");
 }
@@ -113,7 +117,7 @@ void LevelBase::handleCollisions() {
             }
         }
 
-        if (hit || pit->isOffScreen(800, 600)) {
+        if (hit || pit->isOffScreen(screenWidth, screenHeight)) {
             pit = allProjectiles.erase(pit);
         }
         else {
