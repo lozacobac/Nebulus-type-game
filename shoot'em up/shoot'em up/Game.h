@@ -16,7 +16,11 @@ class Game
 public:
     Game() = default;
     int run();
+    int getScreenWidth() const { return screenWidth; }
+    int getScreenHeight() const { return screenHeight; }
 private:
+    int screenWidth = 800;
+    int screenHeight = 600;
     Start* start=nullptr;
     Select* select = nullptr;
     Custom* custom = nullptr;

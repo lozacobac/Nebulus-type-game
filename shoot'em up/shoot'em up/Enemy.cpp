@@ -1,12 +1,14 @@
 #include "Enemy.h"
 #include "Player.h"
 
-Enemy::Enemy(float px, float py) :
+Enemy::Enemy(float px, float py,int sw, int sh) :
     x(px),
     y(py),
     rect({ x, y, 32, 32 }),
     moveTimer(0.0f),
-    shotTimer(0.0f)
+    shotTimer(0.0f),
+    screenWidth(sw),
+    screenHeight(sh)
 {
 }
 
@@ -15,7 +17,7 @@ bool Enemy::checkCollision(const SDL_FRect& other) {
     return SDL_HasRectIntersectionFloat(&rect, &other);
 }
 
-BasicEnemy::BasicEnemy(float px, float py) : Enemy(px, py) {}
+BasicEnemy::BasicEnemy(float px, float py,int sw,int sh) : Enemy(px, py,sw,sh) {}
 
 void BasicEnemy::update(float deltaTime, Player& player) {
     y += 100.0f * deltaTime;
@@ -39,7 +41,7 @@ void BasicEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -54,7 +56,7 @@ void BasicEnemy::render(SDL_Renderer* renderer) {
 
 int BasicEnemy::getType() const { return 23; }
 
-ZigzagEnemy::ZigzagEnemy(float px, float py) : Enemy(px, py) {}
+ZigzagEnemy::ZigzagEnemy(float px, float py, int sw, int sh) : Enemy(px, py,sw,sh) {}
 
 void ZigzagEnemy::update(float deltaTime, Player& player) {
     y += 100.0f * deltaTime;
@@ -81,7 +83,7 @@ void ZigzagEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -97,7 +99,7 @@ void ZigzagEnemy::render(SDL_Renderer* renderer) {
 
 int ZigzagEnemy::getType() const { return 24; }
 
-SkeletonEnemy::SkeletonEnemy(float px, float py) : Enemy(px, py) {}
+SkeletonEnemy::SkeletonEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void SkeletonEnemy::update(float deltaTime, Player& player) {
     y += 100.0f * deltaTime;
@@ -138,7 +140,7 @@ void SkeletonEnemy::render(SDL_Renderer* renderer) {
 
 int SkeletonEnemy::getType() const { return 4; }
 
-BlazeEnemy::BlazeEnemy(float px, float py) : Enemy(px, py) {}
+BlazeEnemy::BlazeEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void BlazeEnemy::update(float deltaTime, Player& player) {
     y += 100.0f * deltaTime;
@@ -183,8 +185,7 @@ void BlazeEnemy::render(SDL_Renderer* renderer) {
 
 int BlazeEnemy::getType() const { return 5; }
 
-ShulkerEnemy::ShulkerEnemy(float px, float py)
-    : Enemy(px, py),
+ShulkerEnemy::ShulkerEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh),
     invulnerabilityTimer(0.0f),
     isInvulnerable(false)
 {
@@ -255,7 +256,7 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
 
         it->update(deltaTime);
 
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else
             ++it;
@@ -287,7 +288,7 @@ bool ShulkerEnemy::checkCollision(const SDL_FRect& other) {
 
 int ShulkerEnemy::getType() const { return 7; }
 
-DragonEnemy::DragonEnemy(float px, float py) : Enemy(px, py) {
+DragonEnemy::DragonEnemy(float px, float py, int sw, int sh) : Enemy(px, py,sw,sh) {
     rect.w = 180;
     rect.h = 250;
 }
@@ -357,7 +358,7 @@ void DragonEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -372,7 +373,7 @@ void DragonEnemy::render(SDL_Renderer* renderer) {
 
 int DragonEnemy::getType() const { return 9; }
 
-Enderman::Enderman(float px, float py) : Enemy(px, py) {}
+Enderman::Enderman(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void Enderman::update(float deltaTime, Player& player) {
     y += 100.0f * deltaTime;
@@ -390,13 +391,13 @@ int Enderman::getType() const { return 8; }
 
 
 
-std::unique_ptr<Enemy> createEnemy(int type, float x, float y) {
-    if (type == 23) return std::make_unique<BasicEnemy>(x, y);
-    else if (type == 24) return std::make_unique<ZigzagEnemy>(x, y);
-    else if (type == 4) return std::make_unique<SkeletonEnemy>(x, y);
-    else if (type == 5) return std::make_unique<BlazeEnemy>(x, y);
-    else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y);
-    else if (type == 8) return std::make_unique<Enderman>(x, y);
-    else if (type == 9) return std::make_unique<DragonEnemy>(x, y);
+std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight) {
+    if (type == 23) return std::make_unique<BasicEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 24) return std::make_unique<ZigzagEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 4) return std::make_unique<SkeletonEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 5) return std::make_unique<BlazeEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 8) return std::make_unique<Enderman>(x, y, screenWidth, screenHeight);
+    else if (type == 9) return std::make_unique<DragonEnemy>(x, y, screenWidth, screenHeight);
     return nullptr;
 }
