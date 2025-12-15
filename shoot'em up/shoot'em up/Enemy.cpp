@@ -153,18 +153,18 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
         float dy = player.y - it->y;
         float distance = sqrt(dx * dx + dy * dy);
 
-        float minHomingDistance = 150.0f;
+        float minHomingDistance = 400.0f;
 
         if (distance > minHomingDistance) {
             float homingStrength = 100.0f;
 
             // Direction vers le joueur
-            float targetVx = (dx / distance) * 150.0f;
-            float targetVy = (dy / distance) * 150.0f;
+            float targetVx = (dx / distance) * 200.0f;
+            float targetVy = (dy / distance) * 200.0f;
 
             // Interpolation vers la direction cible
-            it->vx += (targetVx - it->vx) * homingStrength * deltaTime / 150.0f;
-            it->vy += (targetVy - it->vy) * homingStrength * deltaTime / 150.0f;
+            it->vx += (targetVx - it->vx) * homingStrength * deltaTime / 200.0f;
+            it->vy += (targetVy - it->vy) * homingStrength * deltaTime / 200.0f;
         }
         // Sinon, le projectile continue en ligne droite
 
