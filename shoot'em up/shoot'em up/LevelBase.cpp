@@ -1,6 +1,6 @@
 #include "LevelBase.h"
 #include <iostream>
-#include "Enemy.h"
+#include "Projectile.h"
 
 
 
@@ -31,6 +31,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath) {
     levelCompleted = false;
     levelFailed = false;
     score = 0;
+    DragonHealth = 100;
     enemies.clear();
     allProjectiles.clear();
 
@@ -72,33 +73,30 @@ void LevelBase::handleCollisions() {
         bool hit = false;
 
         if (pit->isPlayer) {
-
             for (auto eit = enemies.begin(); eit != enemies.end(); ) {
                 if ((*eit)->checkCollision(pit->rect)) {
-                    score += 100;
-                    std::cout << "[Info] Enemy destroyed! Score = " << score << "\n";
-                    eit = enemies.erase(eit);
-                    hit = true;
-                    break;
                     if ((*eit)->getType() == 9) {
                         DragonHealth--;
-                        std::cout << "Dragon a �t� toucher" << DragonHealth;
+                        std::cout << "Dragon touche HP restant: " << DragonHealth << "\n";
                         hit = true;
+                        
                         if (DragonHealth <= 0) {
                             levelCompleted = true;
-                            std::cout << "dragon killed";
+                            score += 500;
+                            std::cout << "Dragon vaincu\n";
                             eit = enemies.erase(eit);
-                            break;
                         }
-                        break;
+                        else {
+                            ++eit;
+                        }
                     }
                     else {
+                        score += 100;
+                        std::cout << "Enemy destroyed Score = " << score << "\n";
                         eit = enemies.erase(eit);
                         hit = true;
-                        std::cout << "[INFO] Enemy destroyed!\n";
-                        break;
                     }
-                    
+                    break;
                 }
                 else {
                     ++eit;
@@ -110,7 +108,7 @@ void LevelBase::handleCollisions() {
                 if (!player.isInvincible()) {
                     player.lives--;
                     player.invicibilityTimer = 1.0f;
-                    std::cout << "[INFO] Player hit! Lives : " << player.lives << "\n";
+                    std::cout << "Player hit! Lives : " << player.lives << "\n";
                     if (player.lives <= 0) {
                         levelFailed = true;
                     }
@@ -133,7 +131,6 @@ void LevelBase::handleCollisions() {
             player.projectiles.push_back(p);
         }
     }
-
 }
 
 void LevelBase::handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu) {
