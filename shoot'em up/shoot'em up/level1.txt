@@ -2,4 +2,4 @@
 0.0 SPAWN ENEMY 400 100 1  # Spawn un ennemi basique à x=400, y=100 au temps 0s
 2.0 SPAWN ENEMY 500 150 1  # Spawn un ennemi zigzag à 2s
 4.0 SPAWN ENEMY 300 50 1   # Un autre basique à 4s
-10.0 END                   # Fin du niveau à 10s
+20.0 END                   # Fin du niveau à 10s

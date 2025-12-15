@@ -126,19 +126,16 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
     if (shotTimer >= 5.0f) {
         // Calcul de la direction vers le joueur
         float dx = player.x - x;
-        float dy = player.y - y;
-        float distance = sqrt(dx * dx + dy * dy);
+        
+        float distance = sqrt(dx * dx);
 
         // Normalisation et application de la vitesse
-        float speed = 150.0f;
-        float vx = (dx / distance) * speed;
-        float vy = (dy / distance) * speed;
-
+        
         projectiles.push_back({
             x + rect.w / 2 - 4,
             y + rect.h,
-            vx,
-            vy,
+            0,
+            200.0,
             false,
             {x + rect.w / 2 - 4, y + rect.h, 8, 8}
             });
@@ -150,7 +147,7 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
         // Guidage vers le joueur
         float dx = player.x - it->x;
         float dy = player.y - it->y;
-        float distance = sqrt(dx * dx + dy * dy);
+        float distance = sqrt(dx * dx);
 
         float minHomingDistance = 150.0f;
 
@@ -357,8 +354,32 @@ int Drowned::getType() const { return 1; }
 
 Guardian::Guardian(float px, float py) : Enemy(px, py) {}
 
-void Guardian::update(float deltaTime, Player& player)
-{
+void Guardian::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            200.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(800, 600))
+            it = projectiles.erase(it);
+        else ++it;
+    }
 }
 
 void Guardian::render(SDL_Renderer* renderer)
