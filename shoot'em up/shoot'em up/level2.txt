@@ -1,4 +1,5 @@
 # Level 2 - Zigzag enemies
+# Spawn Entre 0 et 0.985
 0.0 SPAWN ENEMY 200 50 23
 0.0 SPAWN ENEMY 250 50 24
 0.0 SPAWN ENEMY 300 50 23

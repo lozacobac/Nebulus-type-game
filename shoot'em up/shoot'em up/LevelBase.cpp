@@ -43,8 +43,10 @@ void LevelBase::executeCommand(const ScriptCommand& cmd) {
     std::cout << "[CMD] " << cmd.command << " at time " << cmd.time << "\n";
 
     if (cmd.command == "SPAWN" && cmd.params.size() >= 4 && cmd.params[0] == "ENEMY") {
-        float x = std::stof(cmd.params[1]);
-        float y = std::stof(cmd.params[2]);
+        float xPercent = std::stof(cmd.params[1]);
+        float yPercent = std::stof(cmd.params[2]);
+        float x = xPercent * screenWidth;
+        float y = yPercent * screenHeight;
         int type = std::stoi(cmd.params[3]);
 
         auto enemy = createEnemy(type, x, y, screenWidth, screenHeight);

@@ -76,4 +76,4 @@ public:
     int getType() const override;
 };
 
-std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeightj);
+std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight);

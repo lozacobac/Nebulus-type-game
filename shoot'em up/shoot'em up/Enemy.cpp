@@ -41,7 +41,7 @@ void BasicEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -83,7 +83,7 @@ void ZigzagEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -170,7 +170,7 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
 
         it->update(deltaTime);
 
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else
             ++it;
@@ -272,7 +272,7 @@ void DragonEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
