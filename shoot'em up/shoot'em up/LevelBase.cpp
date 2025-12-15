@@ -47,7 +47,7 @@ void LevelBase::executeCommand(const ScriptCommand& cmd) {
         float y = std::stof(cmd.params[2]);
         int type = std::stoi(cmd.params[3]);
 
-        auto enemy = createEnemy(type, x, y);
+        auto enemy = createEnemy(type, x, y, screenWidth, screenHeight);
         if (enemy) {
             enemies.push_back(std::move(enemy));
             std::cout << "[INFO] Enemy spawned at (" << x << ", " << y << ") type " << type << "\n";
