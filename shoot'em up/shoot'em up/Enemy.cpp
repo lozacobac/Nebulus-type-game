@@ -97,6 +97,92 @@ void ZigzagEnemy::render(SDL_Renderer* renderer) {
 
 int ZigzagEnemy::getType() const { return 24; }
 
+SkeletonEnemy::SkeletonEnemy(float px, float py) : Enemy(px, py) {}
+
+void SkeletonEnemy::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            200.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(800, 600))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void SkeletonEnemy::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 206, 206, 206, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_FlushRenderer(renderer);
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int SkeletonEnemy::getType() const { return 4; }
+
+BlazeEnemy::BlazeEnemy(float px, float py) : Enemy(px, py) {}
+
+void BlazeEnemy::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        float dx = player.x - x;
+        float dy = player.y - y;
+        float distance = sqrt(dx * dx + dy * dy);
+        float speed = 200.0f;
+        float vx = (dx / distance) * speed;
+        float vy = (dy / distance) * speed;
+        projectiles.push_back({
+            x + rect.w/2-4,
+            y + rect.h,
+            vx,
+            vy,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(800, 600))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void BlazeEnemy::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 255, 109, 31, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int BlazeEnemy::getType() const { return 5; }
+
 ShulkerEnemy::ShulkerEnemy(float px, float py)
     : Enemy(px, py),
     invulnerabilityTimer(0.0f),
@@ -307,6 +393,8 @@ int Enderman::getType() const { return 8; }
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y) {
     if (type == 23) return std::make_unique<BasicEnemy>(x, y);
     else if (type == 24) return std::make_unique<ZigzagEnemy>(x, y);
+    else if (type == 4) return std::make_unique<SkeletonEnemy>(x, y);
+    else if (type == 5) return std::make_unique<BlazeEnemy>(x, y);
     else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y);
     else if (type == 8) return std::make_unique<Enderman>(x, y);
     else if (type == 9) return std::make_unique<DragonEnemy>(x, y);

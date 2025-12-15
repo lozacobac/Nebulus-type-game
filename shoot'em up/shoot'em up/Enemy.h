@@ -42,6 +42,25 @@ public:
     int getType() const override;
 };
 
+class SkeletonEnemy : public Enemy {
+public:
+    SkeletonEnemy(float px, float py);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
+class BlazeEnemy : public Enemy {
+public:
+    BlazeEnemy(float px, float py);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
+
 class ShulkerEnemy : public Enemy {
 private:
     float invulnerabilityTimer;
