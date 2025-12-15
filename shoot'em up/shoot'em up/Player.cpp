@@ -28,7 +28,7 @@ void Player::setScreenBounds(int width, int height) {
 }
 
 void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bool*
-    float speed = 200.0f;
+    float speed = 300;
     if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A])
         x -= speed * deltaTime;
     if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D])

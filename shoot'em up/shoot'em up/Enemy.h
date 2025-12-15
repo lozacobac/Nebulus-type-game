@@ -11,12 +11,12 @@ class Enemy {
 protected:
     int screenWidth;
     int screenHeight;
+    float shotTimer;
 public:
     float x, y;
     SDL_FRect rect;
     std::vector<Projectile> projectiles;
     float moveTimer;
-    float shotTimer;
 
     Enemy(float px, float py, int sw, int sh);
     virtual ~Enemy() = default;
@@ -47,7 +47,7 @@ public:
 
 class SkeletonEnemy : public Enemy {
 public:
-    SkeletonEnemy(float px, float py);
+    SkeletonEnemy(float px, float py, int sw, int sh);
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
@@ -56,7 +56,7 @@ public:
 
 class BlazeEnemy : public Enemy {
 public:
-    BlazeEnemy(float px, float py);
+    BlazeEnemy(float px, float py, int sw, int sh);
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;

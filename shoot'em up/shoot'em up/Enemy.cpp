@@ -102,7 +102,7 @@ int ZigzagEnemy::getType() const { return 24; }
 SkeletonEnemy::SkeletonEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void SkeletonEnemy::update(float deltaTime, Player& player) {
-    y += 100.0f * deltaTime;
+    y += 50.0f * deltaTime;
     rect.x = x;
     rect.y = y;
 
@@ -304,51 +304,6 @@ void DragonEnemy::update(float deltaTime, Player& player) {
             y + 250,
             0,
             300.0f,
-            false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
-        shotTimer = 0.0f;
-        projectiles.push_back({
-            x + 100,
-            y + 250,
-            0,
-            300.0f,
-            false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
-        shotTimer = 0.0f;
-        projectiles.push_back({
-            x + 0,
-            y + 250,
-            0,
-            500.0f,
-            false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
-        shotTimer = 0.0f;
-        projectiles.push_back({
-            x + 10,
-            y + 250,
-            0,
-            500.0f,
-            false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
-        shotTimer = 0.0f;
-        projectiles.push_back({
-            x + 180,
-            y + 250,
-            0,
-            500.0f,
-            false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
-        shotTimer = 0.0f;
-        projectiles.push_back({
-            x + 170,
-            y + 250,
-            0,
-            500.0f,
             false,
             {x + rect.w / 2 - 4,y + rect.h,8,8}
             });
