@@ -77,19 +77,19 @@ public:
     int getType() const override;
 };
 
-class DragonEnemy : public Enemy {
+class DragonBoss : public Enemy {
 
 public:
-    DragonEnemy(float px, float py, int sw, int sh);
+    DragonBoss(float px, float py, int sw, int sh);
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType() const override;
 };
 
-class Enderman : public Enemy {
+class EndermanEnemy : public Enemy {
 
 public:
-    Enderman(float px, float py, int sw, int sh);
+    EndermanEnemy(float px, float py, int sw, int sh);
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType() const override;
