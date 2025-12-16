@@ -8,14 +8,17 @@
 class Player;
 
 class Enemy {
+protected:
+    int screenWidth;
+    int screenHeight;
+    float shotTimer;
 public:
     float x, y;
     SDL_FRect rect;
     std::vector<Projectile> projectiles;
     float moveTimer;
-    float shotTimer;
 
-    Enemy(float px, float py);
+    Enemy(float px, float py, int sw, int sh);
     virtual ~Enemy() = default;
 
     virtual void update(float deltaTime, Player& player) = 0;
@@ -26,7 +29,7 @@ public:
 
 class BasicEnemy : public Enemy {
 public:
-    BasicEnemy(float px, float py);
+    BasicEnemy(float px, float py, int sw, int sh);
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
@@ -35,7 +38,7 @@ public:
 
 class ZigzagEnemy : public Enemy {
 public:
-    ZigzagEnemy(float px, float py);
+    ZigzagEnemy(float px, float py, int sw, int sh);
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
@@ -44,7 +47,7 @@ public:
 
 class Drowned : public Enemy {
 public:
-    Drowned(float px, float py);
+    Drowned(float px, float py, int sw, int sh);
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
@@ -53,7 +56,7 @@ public:
 
 class Guardian : public Enemy {
 public:
-    Guardian(float px, float py);
+    Guardian(float px, float py, int sw, int sh);
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
@@ -62,19 +65,37 @@ public:
 
 class Elder_Guardian : public Enemy {
 public:
-    Elder_Guardian(float px, float py);
+    Elder_Guardian(float px, float py, int sw, int sh);
 
     void update(float delatTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType()const override;
 };
+class SkeletonEnemy : public Enemy {
+public:
+    SkeletonEnemy(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
+class BlazeEnemy : public Enemy {
+public:
+    BlazeEnemy(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
 
 class ShulkerEnemy : public Enemy {
 private:
     float invulnerabilityTimer;
     bool isInvulnerable;
 public:
-    ShulkerEnemy(float px, float py);
+    ShulkerEnemy(float px, float py, int sw, int sh);
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
@@ -85,7 +106,7 @@ public:
 class DragonEnemy : public Enemy {
 
 public:
-    DragonEnemy(float px, float py);
+    DragonEnemy(float px, float py, int sw, int sh);
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType() const override;
@@ -94,10 +115,10 @@ public:
 class Enderman : public Enemy {
 
 public:
-    Enderman(float px, float py);
+    Enderman(float px, float py, int sw, int sh);
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType() const override;
 };
 
-std::unique_ptr<Enemy> createEnemy(int type, float x, float y);
+std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight);

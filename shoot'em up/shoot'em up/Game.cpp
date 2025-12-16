@@ -34,10 +34,25 @@ bool Game::initializeSDL() {
 }
 
 bool Game::CreateWindowAndRenderer(SDL_Window*& window, SDL_Renderer*& renderer) {
-    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer) && SDL_SetRenderVSync(renderer, 1)) {
+    if (!SDL_CreateWindowAndRenderer("AeroBlade", 800, 600, SDL_WINDOW_FULLSCREEN, &window, &renderer)) {
         std::cerr << "[ERROR] SDL_CreateWindowAndRenderer failed: " << SDL_GetError() << "\n";
         return false;
     }
+
+    if (SDL_SetRenderVSync(renderer, 1)) {
+        std::cerr << "[WARNING] VSync failed: " << SDL_GetError() << "\n";
+    }
+
+    int windowWidth, windowHeight;
+    if (!SDL_GetWindowSize(window, &windowWidth, &windowHeight)) {
+        std::cerr << "[ERROR] Failed to get window size: " << SDL_GetError() << "\n";
+        return false;
+    }
+    std::cout << "[INFO] Window size: " << windowWidth << "x" << windowHeight << "\n";
+
+    this->screenWidth = windowWidth;
+    this->screenHeight = windowHeight;
+    std::cout << "[INFO] Game configured for resolution: " << screenWidth << "x" << screenHeight << "\n";
     return true;
 }
 
@@ -47,7 +62,7 @@ void Game::loadLevel(int index) {
         return;
     }
 
-    currentLevel = std::make_unique<LevelBase>();
+    currentLevel = std::make_unique<LevelBase>(font,screenWidth,screenHeight);
     if (!currentLevel->loadFromFile(levelsOrder[index])) {
         std::cerr << "[ERROR] Failed to load level: " << levelsOrder[index] << "\n";
         currentLevel = nullptr;
