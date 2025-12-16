@@ -13,6 +13,10 @@ public:
     void showWorldTransition(int worldNumber);
     bool isInTransition() const { return inTransition; }
 
+    // Afficher l'ecran de Game Over
+    void showWorldGameOver(int worldNumber);
+    bool isInGameOver() const { return inGameOver; }
+
 private:
     TTF_Font* font;
     int margin;
@@ -34,6 +38,17 @@ private:
     float button4Height;
     float button4X;
     float button4Y;
+    float transitionButtonWidth;
+    float transitionButtonHeight;
+    float spacingBetweenButtons;
+    float centerX;
+    float centerY;
+    float menuButtonX;
+    float menuButtonY;
+    float nextButtonX;
+    float nextButtonY;
+    float GameOverButtonWidth;
+    float GameOverButtonHeight;
     Button buttonLevel1;
     Button buttonLevel2;
     Button buttonLevel3;
@@ -45,6 +60,7 @@ private:
 
     // Etat de transition
     bool inTransition;
+    bool inGameOver;
     int currentWorld;
     bool isFinalWorld;
 };
