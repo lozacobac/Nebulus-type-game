@@ -136,7 +136,7 @@ void Drowned::update(float deltaTime, Player& player)
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -176,7 +176,7 @@ void Guardian::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -224,7 +224,7 @@ void SkeletonEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -271,7 +271,7 @@ void BlazeEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
