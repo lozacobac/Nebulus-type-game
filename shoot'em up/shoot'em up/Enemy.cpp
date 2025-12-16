@@ -442,6 +442,123 @@ void Enderman::render(SDL_Renderer* renderer) {
 
 int Enderman::getType() const { return 8; }
 
+PhantomEnemy::PhantomEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void PhantomEnemy::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            200.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(screenWidth, screenHeight))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void PhantomEnemy::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int PhantomEnemy::getType() const { return 23; }
+
+BasicEnemy::BasicEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void BasicEnemy::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            200.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(screenWidth, screenHeight))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void BasicEnemy::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int BasicEnemy::getType() const { return 23; }
+
+BasicEnemy::BasicEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void BasicEnemy::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            200.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(screenWidth, screenHeight))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void BasicEnemy::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int BasicEnemy::getType() const { return 23; }
+
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight) {
     if (type == 23) return std::make_unique<BasicEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 24) return std::make_unique<ZigzagEnemy>(x, y, screenWidth, screenHeight);

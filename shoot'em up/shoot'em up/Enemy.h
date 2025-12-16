@@ -121,4 +121,31 @@ public:
     int getType() const override;
 };
 
+class PhantomEnemy : public Enemy {
+public:
+    PhantomEnemy(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
+class BasicEnemy : public Enemy {
+public:
+    BasicEnemy(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
+class BasicEnemy : public Enemy {
+public:
+    BasicEnemy(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight);
