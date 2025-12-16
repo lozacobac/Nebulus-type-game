@@ -31,7 +31,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath) {
     levelFailed = false;
     score = 0;
     DragonHealth = 100;
-    WardenHealth = 200;
+    WardenHealth = 150;
     enemies.clear();
     allProjectiles.clear();
 
