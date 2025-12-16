@@ -109,7 +109,7 @@ void Drowned::update(float deltaTime, Player& player)
     float distance = sqrt(dx * dx);
 
     if (distance > 0.0f) {
-        float speed = 500.0f;
+        float speed = 1000.0f;
         float targetVx = (dx / distance) * speed;
         float homingStrength = 5.0f;
         vx += (targetVx - vx) * homingStrength * deltaTime;
@@ -136,7 +136,7 @@ void Drowned::update(float deltaTime, Player& player)
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -168,7 +168,7 @@ void Guardian::update(float deltaTime, Player& player) {
             0,
             200.0f,
             false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            {x + rect.w / 2 - 4,y + rect.h,8, 8}
             });
         shotTimer = 0.0f;
     }
@@ -176,7 +176,7 @@ void Guardian::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -184,6 +184,10 @@ void Guardian::update(float deltaTime, Player& player) {
 
 void Guardian::render(SDL_Renderer* renderer)
 {
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
 int Guardian::getType() const { return 2; }
@@ -196,6 +200,10 @@ void Elder_Guardian::update(float delatTime, Player& player)
 
 void Elder_Guardian::render(SDL_Renderer* renderer)
 {
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
 int Elder_Guardian::getType() const { return 3; }
@@ -224,7 +232,7 @@ void SkeletonEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -271,7 +279,7 @@ void BlazeEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
