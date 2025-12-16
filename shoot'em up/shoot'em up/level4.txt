@@ -1,5 +1,5 @@
 # Script pour Level2 - Shoot 'em up
-0.0 SPAWN ENEMY 400 100 23  # Spawn un ennemi basique à x=400, y=100 au temps 0s
-2.0 SPAWN ENEMY 500 150 24  # Spawn un ennemi zigzag à 2s
-4.0 SPAWN ENEMY 300 50 23   # Un autre basique à 4s
+0.0 SPAWN ENEMY 0.9 0.1 23  # Spawn un ennemi basique à x=400, y=100 au temps 0s
+2.0 SPAWN ENEMY 0.5 0.1 24  # Spawn un ennemi zigzag à 2s
+4.0 SPAWN ENEMY 0.1 0.1 23   # Un autre basique à 4s
 10.0 END                   # Fin du niveau à 10s

@@ -155,6 +155,19 @@ void LevelBase::update(float deltaTime) {
         e->update(deltaTime, player);
     }
 
+    for (auto& enemy : enemies) {
+        enemy->update(deltaTime, player);
+    }
+
+    for (auto& enemy : enemies) {
+        if (!player.isInvincible() && player.checkCollision(enemy->rect)) {
+            player.lives--;
+            player.invicibilityTimer = 2.0f;
+            std::cout << "Player touched" << player.lives << "\n";
+            break;
+        }
+    }
+
     handleCollisions();
 
     if (enemies.empty() && currentCommand >= script.size() && !levelCompleted) {
