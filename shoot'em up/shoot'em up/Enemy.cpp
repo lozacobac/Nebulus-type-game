@@ -445,21 +445,25 @@ int Enderman::getType() const { return 8; }
 PhantomEnemy::PhantomEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void PhantomEnemy::update(float deltaTime, Player& player) {
-    y += 100.0f * deltaTime;
+    y += 150.0f * deltaTime;
+    moveTimer += deltaTime;
+    x += sin(moveTimer * 10.0f) * 200.0f * deltaTime;
     rect.x = x;
     rect.y = y;
 
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
-    if (shotTimer >= 2.0f) {
+    if (shotTimer >= 0.6f) {
         projectiles.push_back({
             x + 12,
             y + 32,
             0,
-            200.0f,
+            350.0f,
             false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
         shotTimer = 0.0f;
     }
     for (auto it = projectiles.begin();
@@ -473,32 +477,45 @@ void PhantomEnemy::update(float deltaTime, Player& player) {
 }
 
 void PhantomEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 191, 255, 255);
     SDL_RenderFillRect(renderer, &rect);
-    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int PhantomEnemy::getType() const { return 23; }
+int PhantomEnemy::getType() const { return 10; }
 
-BasicEnemy::BasicEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+SculkEnemy::SculkEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
-void BasicEnemy::update(float deltaTime, Player& player) {
-    y += 100.0f * deltaTime;
-    rect.x = x;
-    rect.y = y;
+void SculkEnemy::update(float deltaTime, Player& player) {
+    y += 150.0f * deltaTime;
+    moveTimer += deltaTime;
+    x += sin(moveTimer * 7.0f) * 200.0f * deltaTime;
+    rect.x = x; rect.y = y;
 
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
-    if (shotTimer >= 2.0f) {
+    if (shotTimer >= 0.6f) {
         projectiles.push_back({
             x + 12,
             y + 32,
             0,
-            200.0f,
+            350.0f,
             false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            -50,
+            350.0f,
+            false,
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
         shotTimer = 0.0f;
     }
     for (auto it = projectiles.begin();
@@ -511,38 +528,193 @@ void BasicEnemy::update(float deltaTime, Player& player) {
     }
 }
 
-void BasicEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+void SculkEnemy::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 139, 0, 0, 255);
     SDL_RenderFillRect(renderer, &rect);
-    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int BasicEnemy::getType() const { return 23; }
+int SculkEnemy::getType() const { return 11; }
 
-BasicEnemy::BasicEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+WardenBoss::WardenBoss(float px, float py, int sw, int sh, int& wardenHealthRef) : Enemy(px, py, sw, sh), wardenHealthRef(wardenHealthRef) {
+    maxHealth = 200;  // Santé max pour calculer les phases
+    rect.w = 120;
+    rect.h = 100;
+}
 
-void BasicEnemy::update(float deltaTime, Player& player) {
-    y += 100.0f * deltaTime;
+
+void WardenBoss::update(float deltaTime, Player& player) {
+    moveTimer += deltaTime;
+    static float changeDirectionTimer = 0.0f;
+    static float direction = -1.0f;
+    changeDirectionTimer += deltaTime;
+    random rd;
+
+    // Utilise wardenHealthRef pour calculer les phases (liaison correcte avec LevelBase)
+    float healthPercent = (float)wardenHealthRef / (float)maxHealth;
+    int currentPhase = 0;
+    if (healthPercent <= 0.75f) currentPhase = 1;  // 150 HP
+    if (healthPercent <= 0.50f) currentPhase = 2;  // 100 HP
+    if (healthPercent <= 0.25f) currentPhase = 3;  // 50 HP
+    if (healthPercent <= 0.10f) currentPhase = 4;  // 20 HP
+
+    float directionChangeDelay = 1.5f - (currentPhase * 0.2f);
+    if (changeDirectionTimer >= directionChangeDelay + rd.getRandomNumber(0, 99) / 100.0f) {  // Plage 0-99 pour /100.0f
+        int randomChoice = rd.getRandomNumber(0, 2);
+        if (randomChoice == 0) direction = -1.0f;
+        else if (randomChoice == 1) direction = 1.0f;
+        else direction = 0.0f;
+        changeDirectionTimer = 0.0f;
+    }
+
+    float baseSpeed = 100 + (currentPhase * 100);
+    float speed = rd.getRandomNumber(baseSpeed, baseSpeed + 399);  // Plage baseSpeed à baseSpeed+399
+    x += direction * speed * deltaTime;
+
+    if (x < 0) x = 0;
+    else if (x + rect.w > screenWidth) x = screenWidth - rect.w;
     rect.x = x;
     rect.y = y;
 
     static float shotTimer = 0.0f;
+    static float specialAttackTimer = 0.0f;
+    static float spiralTimer = 0.0f;
+
     shotTimer += deltaTime;
-    if (shotTimer >= 2.0f) {
-        projectiles.push_back({
-            x + 12,
-            y + 32,
-            0,
-            200.0f,
-            false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
+    specialAttackTimer += deltaTime;
+    spiralTimer += deltaTime;
+
+    // Valeurs par défaut (Phase 0)
+    float shotDelay = 0.8f;
+    int numProjectiles = 5;
+    float spreadAngle = 0.5f;
+
+    // Phase 1
+    if (currentPhase >= 1) {
+        shotDelay = 0.6f;
+        numProjectiles = 7;
+        spreadAngle = 0.7f;
+    }
+
+    // Phase 2
+    if (currentPhase >= 2) {
+        shotDelay = 0.4f;
+        numProjectiles = 9;
+        spreadAngle = 0.9f;
+
+        if (specialAttackTimer >= 3.0f) {
+            for (int i = 0; i < 8; i++) {
+                float angle = (i / 8.0f) * 3.14159f * 2;
+                projectiles.push_back({
+                    x + rect.w / 2,
+                    y + rect.h / 2,
+                    cos(angle) * 200.0f,
+                    sin(angle) * 200.0f,
+                    false,
+                    {x + rect.w / 2 - 6, y + rect.h / 2 - 6, 12, 12}
+                    });
+            }
+            specialAttackTimer = 0.0f;
+        }
+    }
+
+    // Phase 3
+    if (currentPhase >= 3) {
+        shotDelay = 0.2f;
+        numProjectiles = 0;
+        spreadAngle = 1.2f;
+
+        if (spiralTimer >= 0.1f) {
+            static float spiralAngle = 0.0f;
+            spiralAngle += 0.3f;
+            for (int i = 0; i < 3; i++) {
+                float angle = spiralAngle + (i * 3.14159f * 2 / 3);
+                projectiles.push_back({
+                    x + rect.w / 2,
+                    y + rect.h / 2,
+                    cos(angle) * 150.0f,
+                    sin(angle) * 150.0f,
+                    false,
+                    {x + rect.w / 2 - 5, y + rect.h / 2 - 5, 10, 10}
+                    });
+            }
+            spiralTimer = 0.0f;
+        }
+
+        if (specialAttackTimer >= 2.0f) {
+            for (int i = 0; i < 12; i++) {
+                float angle = (i / 12.0f) * 3.14159f * 2;
+                projectiles.push_back({
+                    x + rect.w / 2,
+                    y + rect.h / 2,
+                    cos(angle) * 250.0f,
+                    sin(angle) * 250.0f,
+                    false,
+                    {x + rect.w / 2 - 6, y + rect.h / 2 - 6, 12, 12}
+                    });
+            }
+            specialAttackTimer = 0.0f;
+        }
+    }
+
+    // Phase 4 (berserk)
+    if (currentPhase >= 4) {
+        shotDelay = 0.1f;
+        numProjectiles = 0;
+        spreadAngle = 1.5f;
+
+        if (spiralTimer >= 0.05f) {
+            static float spiralAngle = 0.0f;
+            spiralAngle += 0.5f;
+            for (int i = 0; i < 5; i++) {
+                float angle = spiralAngle + (i * 3.14159f * 2 / 5);
+                projectiles.push_back({
+                    x + rect.w / 2,
+                    y + rect.h / 2,
+                    cos(angle) * 300.0f,
+                    sin(angle) * 300.0f,
+                    false,
+                    {x + rect.w / 2 - 7, y + rect.h / 2 - 7, 14, 14}
+                    });
+            }
+            spiralTimer = 0.0f;
+        }
+
+        if (specialAttackTimer >= 1.5f) {
+            for (int i = 0; i < 16; i++) {
+                float angle = (i / 16.0f) * 3.14159f * 2;
+                projectiles.push_back({
+                    x + rect.w / 2,
+                    y + rect.h / 2,
+                    cos(angle) * 300.0f,
+                    sin(angle) * 300.0f,
+                    false,
+                    {x + rect.w / 2 - 8, y + rect.h / 2 - 8, 16, 16}
+                    });
+            }
+            specialAttackTimer = 0.0f;
+        }
+    }
+
+    // Tir principal
+    if (shotTimer >= shotDelay) {
+        for (int i = 0; i < numProjectiles; i++) {
+            float angle = (i - (numProjectiles - 1) / 2.0f) * spreadAngle;
+            projectiles.push_back({
+                x + rect.w / 2,
+                y + rect.h,
+                sin(angle) * 100.0f,
+                400.0f + (currentPhase * 50.0f),
+                false,
+                {x + rect.w / 2 - 4 + i * 10, y + rect.h, 8, 8}
+                });
+        }
         shotTimer = 0.0f;
     }
-    for (auto it = projectiles.begin();
-        it != projectiles.end(); ) {
 
+    // Update projectiles
+    for (auto it = projectiles.begin(); it != projectiles.end();) {
         it->update(deltaTime);
         if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
@@ -550,14 +722,33 @@ void BasicEnemy::update(float deltaTime, Player& player) {
     }
 }
 
-void BasicEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+void WardenBoss::render(SDL_Renderer* renderer) {
+    // Utilise wardenHealthRef pour les couleurs (liaison correcte)
+    float healthPercent = (float)wardenHealthRef / (float)maxHealth;
+
+    if (healthPercent > 0.75f) {
+        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255); // Gris foncé
+    }
+    else if (healthPercent > 0.50f) {
+        SDL_SetRenderDrawColor(renderer, 100, 0, 0, 255); // Rouge sombre
+    }
+    else if (healthPercent > 0.25f) {
+        SDL_SetRenderDrawColor(renderer, 150, 0, 0, 255); // Rouge
+    }
+    else if (healthPercent > 0.10f) {
+        SDL_SetRenderDrawColor(renderer, 200, 50, 0, 255); // Orange-rouge
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Rouge vif (berserk)
+    }
+
     SDL_RenderFillRect(renderer, &rect);
-    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int BasicEnemy::getType() const { return 23; }
+int WardenBoss::getType() const { return 12; }
 
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight) {
     if (type == 23) return std::make_unique<BasicEnemy>(x, y, screenWidth, screenHeight);
@@ -570,7 +761,8 @@ std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, 
     else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 8) return std::make_unique<Enderman>(x, y, screenWidth, screenHeight);
     else if (type == 9) return std::make_unique<DragonEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 10) return std::make_unique<PhantomEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 11) return std::make_unique<SculkEnemy>(x, y, screenWidth, screenHeight);
+    // Retiré : else if (type == 12) return std::make_unique<WardenBoss>(x, y, screenWidth, screenHeight);
     return nullptr;
 }
-
-

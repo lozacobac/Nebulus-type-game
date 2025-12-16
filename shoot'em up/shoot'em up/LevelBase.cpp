@@ -2,20 +2,19 @@
 #include <iostream>
 #include "Projectile.h"
 
-
-
-LevelBase::LevelBase(TTF_Font* font,int width, int height)
+LevelBase::LevelBase(TTF_Font* font, int width, int height)
     : currentCommand(0),
     levelStartTime(0),
     levelCompleted(false),
     levelFailed(false),
     score(0),
     font(font),
-    DragonHealth(100),
+    DragonHealth(100),    // Santé du Dragon
+    WardenHealth(200),    // Santé du Warden
     screenWidth(width),
     screenHeight(height),
     scoreTexture(nullptr),
-    player(width,height)
+    player(width, height)
 {
     menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");
 }
@@ -32,6 +31,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath) {
     levelFailed = false;
     score = 0;
     DragonHealth = 100;
+    WardenHealth = 200;
     enemies.clear();
     allProjectiles.clear();
 
@@ -50,10 +50,21 @@ void LevelBase::executeCommand(const ScriptCommand& cmd) {
         float y = yPercent * screenHeight;
         int type = std::stoi(cmd.params[3]);
 
-        auto enemy = createEnemy(type, x, y, screenWidth, screenHeight);
-        if (enemy) {
-            enemies.push_back(std::move(enemy));
-            std::cout << "[INFO] Enemy spawned at (" << x << ", " << y << ") type " << type << "\n";
+        // Condition spéciale pour WardenBoss (type 12) : créer avec &WardenHealth pour lier la santé
+        if (type == 12) {
+            auto enemy = std::make_unique<WardenBoss>(x, y, screenWidth, screenHeight, WardenHealth);
+            if (enemy) {
+                enemies.push_back(std::move(enemy));
+                std::cout << "[INFO] WardenBoss spawned at (" << x << ", " << y << ") with health " << WardenHealth << "\n";
+            }
+        }
+        else {
+            // Pour les autres ennemis, utiliser createEnemy
+            auto enemy = createEnemy(type, x, y, screenWidth, screenHeight);
+            if (enemy) {
+                enemies.push_back(std::move(enemy));
+                std::cout << "[INFO] Enemy spawned at (" << x << ", " << y << ") type " << type << "\n";
+            }
         }
     }
     else if (cmd.command == "END") {
@@ -69,27 +80,50 @@ void LevelBase::handleCollisions() {
             allProjectiles.push_back(p);
         }
     }
+
     for (auto pit = allProjectiles.begin(); pit != allProjectiles.end(); ) {
         bool hit = false;
 
         if (pit->isPlayer) {
             for (auto eit = enemies.begin(); eit != enemies.end(); ) {
                 if ((*eit)->checkCollision(pit->rect)) {
-                    if ((*eit)->getType() == 9) {
+                    int enemyType = (*eit)->getType();
+
+                    // Dragon (type 9)
+                    if (enemyType == 9) {
                         DragonHealth--;
                         std::cout << "Dragon touche HP restant: " << DragonHealth << "\n";
-                        hit = true;
-                        
+                        hit = true;  // IMPORTANT: détruit le projectile
+
                         if (DragonHealth <= 0) {
                             levelCompleted = true;
                             score += 500;
-                            std::cout << "Dragon vaincu\n";
+                            std::cout << "Dragon vaincu!\n";
                             eit = enemies.erase(eit);
                         }
                         else {
                             ++eit;
                         }
+                        break;
                     }
+                    // WardenBoss (type 12)
+                    else if (enemyType == 12) {
+                        WardenHealth--;
+                        std::cout << "Warden touche HP restant: " << WardenHealth << "\n";
+                        hit = true;  // IMPORTANT: détruit le projectile
+
+                        if (WardenHealth <= 0) {
+                            levelCompleted = true;
+                            score += 1000;
+                            std::cout << "Warden vaincu!\n";
+                            eit = enemies.erase(eit);
+                        }
+                        else {
+                            ++eit;
+                        }
+                        break;
+                    }
+                    // Autres ennemis
                     else {
                         score += 100;
                         std::cout << "Enemy destroyed Score = " << score << "\n";
@@ -186,7 +220,6 @@ void LevelBase::draw(SDL_Renderer* renderer) {
     std::string livesText = "Lives : " + std::to_string(player.lives);
     SDL_RenderDebugText(renderer, 10, 30, livesText.c_str());
 }
-
 
 bool LevelBase::isCompleted() const {
     return levelCompleted;

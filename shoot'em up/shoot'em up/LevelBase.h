@@ -16,18 +16,14 @@ protected:
     std::vector<std::unique_ptr<Enemy>> enemies;
     std::vector<Projectile> allProjectiles;
     std::vector<ScriptCommand> script;
-
     Button menuButton;
-
     SDL_Texture* scoreTexture;
     SDL_FRect scoreRect;
-
     size_t currentCommand;
     Uint64 levelStartTime;
     bool levelCompleted;
     bool levelFailed;
     int score;
-
     int screenWidth;
     int screenHeight;
 
@@ -40,7 +36,11 @@ public:
     virtual ~LevelBase() = default;
 
     bool loadFromFile(const std::string& scriptPath);
-    int DragonHealth;
+
+    // Santé des boss (utilisés selon le niveau)
+    int DragonHealth;   // Pour le Dragon (type 9)
+    int WardenHealth;   // Pour le Warden (type 12)
+
     virtual void handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu);
     virtual void update(float deltaTime);
     virtual void draw(SDL_Renderer* renderer);

@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include "random.h"
 #include "Projectile.h"
 
 class Player;
@@ -130,22 +131,24 @@ public:
     int getType() const override;
 };
 
-class BasicEnemy : public Enemy {
+class SculkEnemy : public Enemy {
 public:
-    BasicEnemy(float px, float py, int sw, int sh);
+    SculkEnemy(float px, float py, int sw, int sh);
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType() const override;
 };
 
-class BasicEnemy : public Enemy {
+class WardenBoss : public Enemy {
 public:
-    BasicEnemy(float px, float py, int sw, int sh);
-
+    WardenBoss(float px, float py, int sw, int sh, int& wardenHealthRef);
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType() const override;
+private:
+    int& wardenHealthRef;  // Référence à WardenHealth dans LevelBase pour liaison de la santé
+    int maxHealth;         // Santé maximale pour calculer les phases
 };
 
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight);
