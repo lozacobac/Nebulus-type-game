@@ -326,8 +326,8 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
             projectiles.push_back({
             x + rect.w / 2 - 4,
             y + rect.h,
-            0,
-            200.0,
+            vx,
+            vy,
             false,
             {x + rect.w / 2 - 4, y + rect.h, 8, 8}
                 });
@@ -342,7 +342,7 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
         // Guidage vers le joueur
         float dx = player.x - it->x;
         float dy = player.y - it->y;
-        float distance = sqrt(dx * dx);
+        float distance = sqrt(dx * dx + dy * dy);
 
         float minHomingDistance = 800.0f;
 
