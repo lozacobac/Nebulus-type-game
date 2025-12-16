@@ -32,9 +32,9 @@ Select::Select(SDL_Window* window, TTF_Font* font) : font(font), inTransition(fa
     buttonLevel4 = createButton(button4X, button4Y, button4Width, button4Height, "Level 4");
 
     // Bouton de transition
-    transitionButtonWidth = 300;
-    transitionButtonHeight = 80;
-    spacingBetweenButtons = 40;
+    transitionButtonWidth = windowHeight * 0.3;
+    transitionButtonHeight = windowHeight * 0.1;
+    spacingBetweenButtons = windowHeight * 0.5;
 
     centerX = windowWidth / 2;
     centerY = windowHeight / 2;
@@ -48,8 +48,8 @@ Select::Select(SDL_Window* window, TTF_Font* font) : font(font), inTransition(fa
     buttonNextWorld = createButton(nextButtonX, nextButtonY, transitionButtonWidth, transitionButtonHeight, "Next World");
 
     // Bouton de Game Over
-    GameOverButtonWidth = 300;
-    GameOverButtonHeight = 80;
+    GameOverButtonWidth = windowHeight * 0.3;
+    GameOverButtonHeight = windowHeight * 0.1;
 
     centerX = windowWidth / 2;
     centerY = windowHeight / 2;
