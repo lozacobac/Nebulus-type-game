@@ -99,6 +99,107 @@ void ZigzagEnemy::render(SDL_Renderer* renderer) {
 
 int ZigzagEnemy::getType() const { return 24; }
 
+Drowned::Drowned(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void Drowned::update(float deltaTime, Player& player)
+{
+    y += 50.f * deltaTime;
+    float vx = 0.0f;
+    float dx = player.x - x;
+    float distance = sqrt(dx * dx);
+
+    if (distance > 0.0f) {
+        float speed = 500.0f;
+        float targetVx = (dx / distance) * speed;
+        float homingStrength = 5.0f;
+        vx += (targetVx - vx) * homingStrength * deltaTime;
+        x += vx * deltaTime;
+    }
+
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 1.5f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            250.0f,
+            false,
+            {x + rect.w / 2 - 4, y + rect.h, 8, 8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(screenWidth, screenHeight))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void Drowned::render(SDL_Renderer* renderer){
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int Drowned::getType() const { return 1; }
+
+
+Guardian::Guardian(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void Guardian::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        projectiles.push_back({
+            x + 12,
+            y + 32,
+            0,
+            200.0f,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(screenWidth, screenHeight))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void Guardian::render(SDL_Renderer* renderer)
+{
+}
+
+int Guardian::getType() const { return 2; }
+
+Elder_Guardian::Elder_Guardian(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void Elder_Guardian::update(float delatTime, Player& player)
+{
+}
+
+void Elder_Guardian::render(SDL_Renderer* renderer)
+{
+}
+
+int Elder_Guardian::getType() const { return 3; }
+
 SkeletonEnemy::SkeletonEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void SkeletonEnemy::update(float deltaTime, Player& player) {
@@ -123,7 +224,7 @@ void SkeletonEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -170,7 +271,7 @@ void BlazeEnemy::update(float deltaTime, Player& player) {
         it != projectiles.end(); ) {
 
         it->update(deltaTime);
-        if (it->isOffScreen(800, 600))
+        if (it->isOffScreen(screenWidth, screenHeight))
             it = projectiles.erase(it);
         else ++it;
     }
@@ -225,8 +326,8 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
             projectiles.push_back({
             x + rect.w / 2 - 4,
             y + rect.h,
-            vx,
-            vy,
+            0,
+            200.0,
             false,
             {x + rect.w / 2 - 4, y + rect.h, 8, 8}
                 });
@@ -241,7 +342,7 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
         // Guidage vers le joueur
         float dx = player.x - it->x;
         float dy = player.y - it->y;
-        float distance = sqrt(dx * dx + dy * dy);
+        float distance = sqrt(dx * dx);
 
         float minHomingDistance = 800.0f;
 
@@ -406,11 +507,12 @@ void EndermanEnemy::render(SDL_Renderer* renderer) {
 
 int EndermanEnemy::getType() const { return 8; }
 
-
-
 std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight) {
     if (type == 23) return std::make_unique<BasicEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 24) return std::make_unique<ZigzagEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 1) return std::make_unique<Drowned>(x, y, screenWidth, screenHeight);
+    else if (type == 2) return std::make_unique<Guardian>(x, y, screenWidth, screenHeight);
+    else if (type == 3) return std::make_unique<Elder_Guardian>(x, y, screenWidth, screenHeight);
     else if (type == 4) return std::make_unique<SkeletonEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 5) return std::make_unique<BlazeEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y, screenWidth, screenHeight);
@@ -418,3 +520,5 @@ std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, 
     else if (type == 9) return std::make_unique<DragonBoss>(x, y, screenWidth, screenHeight);
     return nullptr;
 }
+
+

@@ -45,6 +45,32 @@ public:
     int getType() const override;
 };
 
+class Drowned : public Enemy {
+public:
+    Drowned(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType()const override;
+};
+
+class Guardian : public Enemy {
+public:
+    Guardian(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType()const override;
+};
+
+class Elder_Guardian : public Enemy {
+public:
+    Elder_Guardian(float px, float py, int sw, int sh);
+
+    void update(float delatTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType()const override;
+};
 class SkeletonEnemy : public Enemy {
 public:
     SkeletonEnemy(float px, float py, int sw, int sh);
