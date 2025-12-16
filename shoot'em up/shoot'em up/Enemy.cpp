@@ -109,7 +109,7 @@ void Drowned::update(float deltaTime, Player& player)
     float distance = sqrt(dx * dx);
 
     if (distance > 0.0f) {
-        float speed = 500.0f;
+        float speed = 100.0f;
         float targetVx = (dx / distance) * speed;
         float homingStrength = 5.0f;
         vx += (targetVx - vx) * homingStrength * deltaTime;
@@ -119,9 +119,9 @@ void Drowned::update(float deltaTime, Player& player)
     rect.x = x;
     rect.y = y;
 
-    static float shotTimer = 0.0f;
+    static float shotTimer = 1.5f;
     shotTimer += deltaTime;
-    if (shotTimer >= 1.5f) {
+    if (shotTimer >= 2.0f) {
         projectiles.push_back({
             x + 12,
             y + 32,
@@ -130,7 +130,7 @@ void Drowned::update(float deltaTime, Player& player)
             false,
             {x + rect.w / 2 - 4, y + rect.h, 8, 8}
             });
-        shotTimer = 0.0f;
+        shotTimer = 1.5f;
     }
     for (auto it = projectiles.begin();
         it != projectiles.end(); ) {
@@ -155,22 +155,101 @@ int Drowned::getType() const { return 1; }
 Guardian::Guardian(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void Guardian::update(float deltaTime, Player& player) {
-    y += 100.0f * deltaTime;
+    y += 50.0f * deltaTime;
     rect.x = x;
     rect.y = y;
 
-    static float shotTimer = 0.0f;
-    shotTimer += deltaTime;
-    if (shotTimer >= 2.0f) {
-        projectiles.push_back({
-            x + 12,
-            y + 32,
-            0,
-            200.0f,
-            false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
-        shotTimer = 0.0f;
+    phaseTimer += deltaTime;
+    if (currentPhase == BURST) {
+        shotTimer += deltaTime;
+        if (shotTimer >= 0.001f) {
+            float dx = player.x - x;
+            float dy = player.y - y;
+            float distance = sqrt(dx * dx + dy * dy);
+            float speed = 200.0f;
+            float vx = (dx / distance) * speed;
+            float vy = (dy / distance) * speed;
+            projectiles.push_back({
+                x + rect.w / 2 - 4,
+                y + rect.h,
+                vx,
+                vy,
+                false,
+                {x + rect.w / 2 - 4,y + rect.h,8,8}
+                });
+            shotTimer = 0.0f;
+        }
+
+        if (phaseTimer >= 1.5f) {
+            currentPhase = PAUSE;
+            phaseTimer = 0.0f;
+            shotTimer = 0.0f;
+        }
+    }
+    else {
+        if (phaseTimer >= 2.0f) {
+            currentPhase = BURST;
+            phaseTimer = 0.0f;
+        }
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(screenWidth, screenHeight))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+void Guardian::render(SDL_Renderer* renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int Guardian::getType() const { return 2; }
+
+Elder_Guardian::Elder_Guardian(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void Elder_Guardian::update(float deltaTime, Player& player)
+{
+    rect.w = 150;
+    rect.h = 200;
+
+    phaseTimer += deltaTime;
+    if (currentPhase == BURST) {
+        shotTimer += deltaTime;
+        if (shotTimer >= 0.001f) {
+            float dx = player.x - x;
+            float dy = player.y - y;
+            float distance = sqrt(dx * dx + dy * dy);
+            float speed = 200.0f;
+            float vx = (dx / distance) * speed;
+            float vy = (dy / distance) * speed;
+            projectiles.push_back({
+                x + rect.w / 2 - 4,
+                y + rect.h,
+                vx,
+                vy,
+                false,
+                {x + rect.w / 2 ,y + rect.h,8,8}
+                });
+            shotTimer = 0.0f;
+        }
+
+        if (phaseTimer >= 1.5f) {
+            currentPhase = PAUSE;
+            phaseTimer = 0.0f;
+            shotTimer = 0.0f;
+        }
+    }
+    else {
+        if (phaseTimer >= 2.0f) {
+            currentPhase = BURST;
+            phaseTimer = 0.0f;
+        }
     }
     for (auto it = projectiles.begin();
         it != projectiles.end(); ) {
@@ -182,20 +261,12 @@ void Guardian::update(float deltaTime, Player& player) {
     }
 }
 
-void Guardian::render(SDL_Renderer* renderer)
-{
-}
-
-int Guardian::getType() const { return 2; }
-
-Elder_Guardian::Elder_Guardian(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
-
-void Elder_Guardian::update(float delatTime, Player& player)
-{
-}
-
 void Elder_Guardian::render(SDL_Renderer* renderer)
 {
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
 int Elder_Guardian::getType() const { return 3; }

@@ -61,15 +61,27 @@ public:
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType()const override;
+
+private:
+    enum Phase { BURST, PAUSE };
+    Phase currentPhase = BURST;
+    float phaseTimer = 0.0f;
+    float shotTimer = 0.0f;
 };
 
 class Elder_Guardian : public Enemy {
 public:
     Elder_Guardian(float px, float py, int sw, int sh);
 
-    void update(float delatTime, Player& player) override;
+    void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
     int getType()const override;
+
+private:
+    enum Phase { BURST, PAUSE };
+    Phase currentPhase = BURST;
+    float phaseTimer = 0.0f;
+    float shotTimer = 0.0f;
 };
 class SkeletonEnemy : public Enemy {
 public:
