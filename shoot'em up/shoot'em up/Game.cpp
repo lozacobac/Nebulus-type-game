@@ -62,8 +62,9 @@ void Game::loadLevel(int index) {
         return;
     }
 
-    currentLevel = std::make_unique<LevelBase>(font,screenWidth,screenHeight);
-    if (!currentLevel->loadFromFile(levelsOrder[index])) {
+    currentLevel = std::make_unique<LevelBase>(font, screenWidth, screenHeight);
+    // AJOUTE renderer ici (tu devras le passer en paramètre ou le stocker dans Game)
+    if (!currentLevel->loadFromFile(levelsOrder[index], renderer)) {
         std::cerr << "[ERROR] Failed to load level: " << levelsOrder[index] << "\n";
         currentLevel = nullptr;
     }
@@ -118,7 +119,6 @@ void Game::drawMenu(SDL_Renderer* renderer) {
 
 int Game::run() {
     SDL_Window* window = nullptr;
-    SDL_Renderer* renderer = nullptr;
 
     SDL_SetAppMetadata("AeroBlade", "1.0", "games.anakata.test-sdl");
 
@@ -127,10 +127,11 @@ int Game::run() {
         return 1;
     }
 
-    if (!CreateWindowAndRenderer(window, renderer)) {
+    if (!CreateWindowAndRenderer(window, this->renderer)) {
         SDL_Quit();
         return 1;
     }
+
     custom = new Custom(window, this->font);
     select = new Select(window, this->font);
     start = new Start();

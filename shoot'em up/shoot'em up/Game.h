@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include <memory>
 #include <vector>
 #include <string>
@@ -29,6 +30,8 @@ private:
     std::unique_ptr<LevelBase> currentLevel;
     bool shouldQuit = false;
     int totalScore = 0;
+
+    SDL_Renderer* renderer;
 
     enum class State { MENU, CUSTOM, SELECT, LEVEL };
     State currentState;

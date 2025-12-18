@@ -35,7 +35,7 @@ public:
     LevelBase(TTF_Font* font, int width, int height);
     virtual ~LevelBase() = default;
 
-    bool loadFromFile(const std::string& scriptPath);
+    bool loadFromFile(const std::string& scriptPath, SDL_Renderer* renderer);
 
     // Santé des boss (utilisés selon le niveau)
     int DragonHealth;   // Pour le Dragon (type 9)

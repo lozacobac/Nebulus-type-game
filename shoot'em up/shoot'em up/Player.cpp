@@ -1,25 +1,61 @@
 #include "Player.h"
 
 Player::Player() : 
-    x(400), 
-    y(500), 
-    lives(3), 
-    rect({ x, y, 32, 32 }), 
+    x(400),
+    y(500),
+    lives(3),
+    rect({ x, y, 32, 32 }),
     invicibilityTimer(0.0f),
     screenWidth(800),
-    screenHeight(600)
+    screenHeight(600),
+    texture(nullptr)
 {
 }
 
 Player::Player(int width, int height) :
-    x(width/2.0f),
-    y(height-100),
+    x(width / 2.0f),
+    y(height - 100),
     lives(3),
-    rect({ width/2.0f,height-100.0f,32,32 }),
+    rect({ width / 2.0f, height - 100.0f, 32, 32 }),
     invicibilityTimer(0.0f),
     screenWidth(width),
-    screenHeight(height)
+    screenHeight(height),
+    texture(nullptr)
 {
+}
+
+Player::Player(int width, int height, SDL_Renderer* renderer, const char* imagePath) :
+    x(width / 2.0f),
+    y(height - 100),
+    lives(3),
+    rect({ width / 2.0f, height - 100.0f, 32, 32 }),
+    invicibilityTimer(0.0f),
+    screenWidth(width),
+    screenHeight(height),
+    texture(nullptr)
+{
+    SDL_Surface* surface = IMG_Load(imagePath);
+    if (surface) {
+        texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_DestroySurface(surface);
+
+        if (texture) {
+            std::cout << "[INFO] Player texture loaded successfully\n";
+        }
+        else {
+            std::cerr << "[ERROR] Failed to create texture: " << SDL_GetError() << "\n";
+        }
+    }
+    else {
+        std::cerr << "[ERROR] Failed to load image: " << SDL_GetError() << "\n";
+    }
+}
+
+Player::~Player() {
+    if (texture) {
+        SDL_DestroyTexture(texture);
+        texture = nullptr;
+    }
 }
 
 void Player::setScreenBounds(int width, int height) {
@@ -52,12 +88,12 @@ void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bo
 
 
 
-    if (keys[SDL_SCANCODE_SPACE] && shotTimer >= 0.2f) {
+    if (keys[SDL_SCANCODE_SPACE] && shotTimer >= 0.1f) {
         projectiles.push_back({
             x + 12,
             y, 
             0, 
-            -300.0f, 
+            -1000.0f, 
             true, 
             {x + rect.w / 2 - 4,y,8,8}
         });
@@ -72,18 +108,52 @@ void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bo
     }
 }
 
-void Player::render(SDL_Renderer* renderer) {
-    if (isInvincible()) {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+void Player::loadTexture(SDL_Renderer* renderer, const char* imagePath) {
+    if (texture) {
+        SDL_DestroyTexture(texture);
+    }
+
+    SDL_Surface* surface = IMG_Load(imagePath);
+    if (surface) {
+        texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_DestroySurface(surface);
+
+        if (texture) {
+            std::cout << "[INFO] Player texture loaded\n";
+        }
+        else {
+            std::cerr << "[ERROR] Failed to create texture: " << SDL_GetError() << "\n";
+        }
     }
     else {
-        SDL_SetRenderDrawColor(renderer, 230, 123, 209, 255);
+        std::cerr << "[ERROR] Failed to load image: " << SDL_GetError() << "\n";
     }
-    SDL_RenderFillRect(renderer, &rect);
+}
+
+void Player::render(SDL_Renderer* renderer) {
+    if (texture) {
+        if (isInvincible()) {
+            SDL_SetTextureColorMod(texture, 255, 100, 100);
+        }
+        else {
+            SDL_SetTextureColorMod(texture, 255, 255, 255);
+        }
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
+    }
+    else {
+        if (isInvincible()) {
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        }
+        else {
+            SDL_SetRenderDrawColor(renderer, 230, 123, 209, 255);
+        }
+        SDL_RenderFillRect(renderer, &rect);
+    }
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-    for (auto& p : projectiles)
+    for (auto& p : projectiles) {
         SDL_RenderFillRect(renderer, &p.rect);
+    }
 }
 
 bool Player::checkCollision(const SDL_FRect& other) {

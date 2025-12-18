@@ -19,11 +19,13 @@ LevelBase::LevelBase(TTF_Font* font, int width, int height)
     menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");
 }
 
-bool LevelBase::loadFromFile(const std::string& scriptPath) {
+bool LevelBase::loadFromFile(const std::string& scriptPath, SDL_Renderer* renderer) {
     if (!LevelLoader::loadLevelScript(scriptPath, script)) {
         std::cerr << "[ERROR] Failed to load level script: " << scriptPath << "\n";
         return false;
     }
+
+    player.loadTexture(renderer, "Img/player.png");
 
     levelStartTime = SDL_GetTicks();
     currentCommand = 0;
