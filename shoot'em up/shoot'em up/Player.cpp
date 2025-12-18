@@ -50,6 +50,8 @@ void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bo
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
 
+
+
     if (keys[SDL_SCANCODE_SPACE] && shotTimer >= 0.2f) {
         projectiles.push_back({
             x + 12,

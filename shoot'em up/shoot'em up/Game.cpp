@@ -231,10 +231,11 @@ int Game::run() {
                 }
             }
             else if (currentLevel->isFailed()) {
+                select ->showWorldGameOver(currentLevelIndex + 1);
                 std::cout << "[INFO] Level failed!\n" << "[INFO] Score for this run : " << totalScore << "\n";
                 totalScore = 0;
                 currentLevel = nullptr;
-                currentState = State::MENU;
+                currentState = State::SELECT;
             }
         }
 

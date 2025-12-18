@@ -109,7 +109,7 @@ void Drowned::update(float deltaTime, Player& player)
     float distance = sqrt(dx * dx);
 
     if (distance > 0.0f) {
-        float speed = 500.0f;
+        float speed = 100.0f;
         float targetVx = (dx / distance) * speed;
         float homingStrength = 5.0f;
         vx += (targetVx - vx) * homingStrength * deltaTime;
@@ -119,9 +119,9 @@ void Drowned::update(float deltaTime, Player& player)
     rect.x = x;
     rect.y = y;
 
-    static float shotTimer = 0.0f;
+    static float shotTimer = 1.5f;
     shotTimer += deltaTime;
-    if (shotTimer >= 1.5f) {
+    if (shotTimer >= 2.0f) {
         projectiles.push_back({
             x + 12,
             y + 32,
@@ -130,7 +130,7 @@ void Drowned::update(float deltaTime, Player& player)
             false,
             {x + rect.w / 2 - 4, y + rect.h, 8, 8}
             });
-        shotTimer = 0.0f;
+        shotTimer = 1.5f;
     }
     for (auto it = projectiles.begin();
         it != projectiles.end(); ) {
@@ -155,22 +155,101 @@ int Drowned::getType() const { return 1; }
 Guardian::Guardian(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void Guardian::update(float deltaTime, Player& player) {
-    y += 100.0f * deltaTime;
+    y += 50.0f * deltaTime;
     rect.x = x;
     rect.y = y;
 
-    static float shotTimer = 0.0f;
-    shotTimer += deltaTime;
-    if (shotTimer >= 2.0f) {
-        projectiles.push_back({
-            x + 12,
-            y + 32,
-            0,
-            200.0f,
-            false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
-        shotTimer = 0.0f;
+    phaseTimer += deltaTime;
+    if (currentPhase == BURST) {
+        shotTimer += deltaTime;
+        if (shotTimer >= 0.001f) {
+            float dx = player.x - x;
+            float dy = player.y - y;
+            float distance = sqrt(dx * dx + dy * dy);
+            float speed = 200.0f;
+            float vx = (dx / distance) * speed;
+            float vy = (dy / distance) * speed;
+            projectiles.push_back({
+                x + rect.w / 2 - 4,
+                y + rect.h,
+                vx,
+                vy,
+                false,
+                {x + rect.w / 2 - 4,y + rect.h,8,8}
+                });
+            shotTimer = 0.0f;
+        }
+
+        if (phaseTimer >= 1.5f) {
+            currentPhase = PAUSE;
+            phaseTimer = 0.0f;
+            shotTimer = 0.0f;
+        }
+    }
+    else {
+        if (phaseTimer >= 2.0f) {
+            currentPhase = BURST;
+            phaseTimer = 0.0f;
+        }
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(screenWidth, screenHeight))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+void Guardian::render(SDL_Renderer* renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int Guardian::getType() const { return 2; }
+
+Elder_Guardian::Elder_Guardian(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void Elder_Guardian::update(float deltaTime, Player& player)
+{
+    rect.w = 150;
+    rect.h = 200;
+
+    phaseTimer += deltaTime;
+    if (currentPhase == BURST) {
+        shotTimer += deltaTime;
+        if (shotTimer >= 0.001f) {
+            float dx = player.x - x;
+            float dy = player.y - y;
+            float distance = sqrt(dx * dx + dy * dy);
+            float speed = 200.0f;
+            float vx = (dx / distance) * speed;
+            float vy = (dy / distance) * speed;
+            projectiles.push_back({
+                x + rect.w / 2 - 4,
+                y + rect.h,
+                vx,
+                vy,
+                false,
+                {x + rect.w / 2 ,y + rect.h,8,8}
+                });
+            shotTimer = 0.0f;
+        }
+
+        if (phaseTimer >= 1.5f) {
+            currentPhase = PAUSE;
+            phaseTimer = 0.0f;
+            shotTimer = 0.0f;
+        }
+    }
+    else {
+        if (phaseTimer >= 2.0f) {
+            currentPhase = BURST;
+            phaseTimer = 0.0f;
+        }
     }
     for (auto it = projectiles.begin();
         it != projectiles.end(); ) {
@@ -182,20 +261,12 @@ void Guardian::update(float deltaTime, Player& player) {
     }
 }
 
-void Guardian::render(SDL_Renderer* renderer)
-{
-}
-
-int Guardian::getType() const { return 2; }
-
-Elder_Guardian::Elder_Guardian(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
-
-void Elder_Guardian::update(float delatTime, Player& player)
-{
-}
-
 void Elder_Guardian::render(SDL_Renderer* renderer)
 {
+    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
 int Elder_Guardian::getType() const { return 3; }
@@ -299,7 +370,7 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
 
     invulnerabilityTimer += deltaTime;
 
-    if (invulnerabilityTimer < 2.0f) {
+    if (invulnerabilityTimer < 3.0f) {
         isInvulnerable = false;
     }
     else if (invulnerabilityTimer < 4.0f) {
@@ -312,32 +383,39 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
     if (shotTimer >= 5.0f) {
-        // Calcul de la direction vers le joueur
-        float dx = player.x - x;
-        
-        float distance = sqrt(dx * dx);
+        if (player.y > y) {
+            // Calcul de la direction vers le joueur
+            float dx = player.x - x;
+            float dy = player.y - y;
+            float distance = sqrt(dx * dx + dy * dy);
 
-        // Normalisation et application de la vitesse
-        
-        projectiles.push_back({
+            // Normalisation et application de la vitesse
+            float speed = 150.0f;
+            float vx = (dx / distance) * speed;
+            float vy = (dy / distance) * speed;
+
+            projectiles.push_back({
             x + rect.w / 2 - 4,
             y + rect.h,
-            0,
-            200.0,
+            vx,
+            vy,
             false,
             {x + rect.w / 2 - 4, y + rect.h, 8, 8}
-            });
+                });
+        }
         shotTimer = 0.0f;
+
+        
     }
 
-    // Mise � jour des projectiles avec guidage
+    // Mise a jour des projectiles avec guidage
     for (auto it = projectiles.begin(); it != projectiles.end(); ) {
         // Guidage vers le joueur
         float dx = player.x - it->x;
         float dy = player.y - it->y;
-        float distance = sqrt(dx * dx);
+        float distance = sqrt(dx * dx + dy * dy);
 
-        float minHomingDistance = 400.0f;
+        float minHomingDistance = 800.0f;
 
         if (distance > minHomingDistance) {
             float homingStrength = 100.0f;
@@ -386,12 +464,12 @@ bool ShulkerEnemy::checkCollision(const SDL_FRect& other) {
 
 int ShulkerEnemy::getType() const { return 7; }
 
-DragonEnemy::DragonEnemy(float px, float py, int sw, int sh) : Enemy(px, py,sw,sh) {
+DragonBoss::DragonBoss(float px, float py, int sw, int sh) : Enemy(px, py,sw,sh) {
     rect.w = 180;
     rect.h = 250;
 }
 
-void DragonEnemy::update(float deltaTime, Player& player) {
+void DragonBoss::update(float deltaTime, Player& player) {
 
 
     static float shotTimer = 0.0f;
@@ -401,10 +479,67 @@ void DragonEnemy::update(float deltaTime, Player& player) {
             x + 80,
             y + 250,
             0,
-            300.0f,
+            350.0f,
             false,
-            {x + rect.w / 2 - 4,y + rect.h,8,8}
-            });
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 100,
+            y + 250,
+            0,
+            350.0f,
+            false,
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 0,
+            y + 250,
+            0,
+            450.0f,
+            false,
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 10,
+            y + 250,
+            0,
+            450.0f,
+            false,
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 180,
+            y + 250,
+            0,
+            450.0f,
+            false,
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
+        shotTimer = 0.0f;
+        projectiles.push_back({
+            x + 170,
+            y + 250,
+            0,
+            450.0f,
+            false,
+            {x + rect.w / 2 - 4,
+            y + rect.h,
+            8,
+            8} });
         shotTimer = 0.0f;
     }
     for (auto it = projectiles.begin();
@@ -415,32 +550,33 @@ void DragonEnemy::update(float deltaTime, Player& player) {
             it = projectiles.erase(it);
         else ++it;
     }
+    
 }
 
-void DragonEnemy::render(SDL_Renderer* renderer) {
+void DragonBoss::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderFillRect(renderer, &rect);
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int DragonEnemy::getType() const { return 9; }
+int DragonBoss::getType() const { return 9; }
 
-Enderman::Enderman(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+EndermanEnemy::EndermanEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
-void Enderman::update(float deltaTime, Player& player) {
+void EndermanEnemy::update(float deltaTime, Player& player) {
     y += 100.0f * deltaTime;
     rect.x = x;
     rect.y = y;
 }
 
-void Enderman::render(SDL_Renderer* renderer) {
+void EndermanEnemy::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 255, 30, 90, 160);
     SDL_RenderFillRect(renderer, &rect);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int Enderman::getType() const { return 8; }
+int EndermanEnemy::getType() const { return 8; }
 
 PhantomEnemy::PhantomEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
