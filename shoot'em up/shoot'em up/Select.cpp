@@ -72,13 +72,13 @@ void Select::showWorldGameOver(int worldNumber)
 
 void Select::handleEvent(const SDL_Event& event, int& selectedLevel) {
     if (inTransition) {
-        // Gerer les evenements de l'ecran de transition
+        // Gérer les evenements de l'écran de transition
         handleButtonEvent(&buttonBackToMenu, const_cast<SDL_Event*>(&event));
         handleButtonEvent(&buttonNextWorld, const_cast<SDL_Event*>(&event));
 
         if (isButtonClicked(&buttonBackToMenu, const_cast<SDL_Event*>(&event))) {
             inTransition = false;
-            selectedLevel = -1; // Code special pour retour au menu
+            selectedLevel = -1; // Code spécial pour retour au menu
         }
         else if (isButtonClicked(&buttonNextWorld, const_cast<SDL_Event*>(&event))) {
             inTransition = false;
@@ -86,6 +86,7 @@ void Select::handleEvent(const SDL_Event& event, int& selectedLevel) {
         }
     }
 
+    // En appuyant sur le bouton Menu au Game over, retourner à l'écran de sélection des niveaux
     if (inGameOver) {
         handleButtonEvent(&buttonBackToMenu, const_cast<SDL_Event*>(&event));
 
@@ -96,7 +97,7 @@ void Select::handleEvent(const SDL_Event& event, int& selectedLevel) {
     }
 
     else {
-        // Gerer les evenements normaux de selection de niveau
+        // Gérer les évenements normaux de selection de niveau
         handleButtonEvent(&buttonLevel1, const_cast<SDL_Event*>(&event));
         handleButtonEvent(&buttonLevel2, const_cast<SDL_Event*>(&event));
         handleButtonEvent(&buttonLevel3, const_cast<SDL_Event*>(&event));
@@ -119,18 +120,20 @@ void Select::handleEvent(const SDL_Event& event, int& selectedLevel) {
 
 void Select::draw(SDL_Renderer* renderer) {
     if (inTransition) {
-        // Dessiner l'ecran de transition
+        // Dessiner l'écran de transition
         SDL_SetRenderDrawColorFloat(renderer, 0.2f, 0.2f, 0.3f, 1.0f);
         SDL_RenderFillRect(renderer, nullptr);
 
-        // Pour l'instant, on dessine juste les boutons
+        // Dessiner les boutons
         renderButton(renderer, &buttonBackToMenu, font);
         renderButton(renderer, &buttonNextWorld, font);
     }
     else if (inGameOver) {
+        // Dessiner l'écran de Game over
         SDL_SetRenderDrawColorFloat(renderer, 0.2f, 0.2f, 0.3f, 1.0f);
         SDL_RenderFillRect(renderer, nullptr);
 
+        // Dessiner le bouton
         renderButton(renderer, &buttonBackToMenu, font);
     }
     else {
@@ -138,6 +141,7 @@ void Select::draw(SDL_Renderer* renderer) {
         SDL_SetRenderDrawColorFloat(renderer, 1.0f, 1.0f, 0.0f, 1.0f);
         SDL_RenderFillRect(renderer, nullptr);
 
+        // Dessiner les boutons des niveaux
         renderButton(renderer, &buttonLevel1, font);
         renderButton(renderer, &buttonLevel2, font);
         renderButton(renderer, &buttonLevel3, font);

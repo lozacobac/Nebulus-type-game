@@ -26,7 +26,8 @@ void BasicEnemy::update(float deltaTime, Player& player) {
 
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
-    if (shotTimer >= 2.0f) {
+    if (shotTimer >= 2.0f) { // Tire toute les 2 secondes
+        // Taille, la postion et vitesse du projectile
         projectiles.push_back({
             x + 12,
             y + 32,
@@ -35,8 +36,9 @@ void BasicEnemy::update(float deltaTime, Player& player) {
             false,
             {x + rect.w / 2 - 4,y + rect.h,8,8}
             });
-        shotTimer = 0.0f;
+        shotTimer = 0.0f; // Timer réinitialiser
     }
+    // Si le projectile sort de la fenêtre et n'est donc plus visible alors on le supprime
     for (auto it = projectiles.begin();
         it != projectiles.end(); ) {
 
@@ -47,6 +49,7 @@ void BasicEnemy::update(float deltaTime, Player& player) {
     }
 }
 
+// Créer l'ennemi ainsi que sa couleur et la couleur de ses projectiles
 void BasicEnemy::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
     SDL_RenderFillRect(renderer, &rect);
@@ -54,7 +57,7 @@ void BasicEnemy::render(SDL_Renderer* renderer) {
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int BasicEnemy::getType() const { return 23; }
+int BasicEnemy::getType() const { return 23; } // ID de l'ennemi
 
 ZigzagEnemy::ZigzagEnemy(float px, float py, int sw, int sh) : Enemy(px, py,sw,sh) {}
 
@@ -66,7 +69,8 @@ void ZigzagEnemy::update(float deltaTime, Player& player) {
 
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
-    if (shotTimer >= 1.0f) {
+    if (shotTimer >= 1.0f) {// Tire toute les 1 secondes
+        // Taille, la postion et vitesse du projectile
         projectiles.push_back({
             x + 12,
             y + 32,
@@ -77,8 +81,9 @@ void ZigzagEnemy::update(float deltaTime, Player& player) {
             y + rect.h,
             8,
             8} });
-        shotTimer = 0.0f;
+        shotTimer = 0.0f; // Timer réinitialiser
     }
+    // Si le projectile sort de la fenêtre et n'est donc plus visible alors on le supprime
     for (auto it = projectiles.begin();
         it != projectiles.end(); ) {
 
@@ -89,7 +94,7 @@ void ZigzagEnemy::update(float deltaTime, Player& player) {
     }
 }
 
-
+// Créer l'ennemi ainsi que sa couleur et la couleur de ses projectiles
 void ZigzagEnemy::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 58, 164, 118, 255);
     SDL_RenderFillRect(renderer, &rect);
@@ -97,7 +102,7 @@ void ZigzagEnemy::render(SDL_Renderer* renderer) {
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int ZigzagEnemy::getType() const { return 24; }
+int ZigzagEnemy::getType() const { return 24; } // ID de l'ennemi
 
 Drowned::Drowned(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
@@ -160,9 +165,9 @@ void Guardian::update(float deltaTime, Player& player) {
     rect.y = y;
 
     phaseTimer += deltaTime;
-    if (currentPhase == BURST) {
+    if (currentPhase == BURST) { 
         shotTimer += deltaTime;
-        if (shotTimer >= 0.001f) {
+        if (shotTimer >= 0.001f) { // Tire un projectile toute les 0.001 secondes
             float dx = player.x - x;
             float dy = player.y - y;
             float distance = sqrt(dx * dx + dy * dy);
@@ -180,12 +185,14 @@ void Guardian::update(float deltaTime, Player& player) {
             shotTimer = 0.0f;
         }
 
+        // Après 1.5 secondes en Burst, ne fait rien durant son état pause
         if (phaseTimer >= 1.5f) {
             currentPhase = PAUSE;
             phaseTimer = 0.0f;
             shotTimer = 0.0f;
         }
     }
+    // Après 2 secondes en Pause, recommence à tirer en Burst
     else {
         if (phaseTimer >= 2.0f) {
             currentPhase = BURST;
@@ -221,7 +228,7 @@ void Elder_Guardian::update(float deltaTime, Player& player)
     phaseTimer += deltaTime;
     if (currentPhase == BURST) {
         shotTimer += deltaTime;
-        if (shotTimer >= 0.001f) {
+        if (shotTimer >= 0.001f) { // Tire un projectile toute les 0.001 secondes
             float dx = player.x - x;
             float dy = player.y - y;
             float distance = sqrt(dx * dx + dy * dy);
@@ -239,12 +246,14 @@ void Elder_Guardian::update(float deltaTime, Player& player)
             shotTimer = 0.0f;
         }
 
+        // Après 1.5 secondes en Burst, ne fait rien durant son état pause
         if (phaseTimer >= 1.5f) {
             currentPhase = PAUSE;
             phaseTimer = 0.0f;
             shotTimer = 0.0f;
         }
     }
+    // Après 2 secondes en Pause, recommence à tirer en Burst
     else {
         if (phaseTimer >= 2.0f) {
             currentPhase = BURST;
@@ -358,8 +367,8 @@ void BlazeEnemy::render(SDL_Renderer* renderer) {
 int BlazeEnemy::getType() const { return 5; }
 
 ShulkerEnemy::ShulkerEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh),
-    invulnerabilityTimer(0.0f),
-    isInvulnerable(false)
+    invulnerabilityTimer(0.0f),// Timer à 0
+    isInvulnerable(false) // COmmence en étant invincible = faux
 {
 }
 
@@ -370,14 +379,16 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
 
     invulnerabilityTimer += deltaTime;
 
+    // EN dessous de 3 secondes shulker n'est pas invincible
     if (invulnerabilityTimer < 3.0f) {
         isInvulnerable = false;
     }
+    // Sinon en dessous de 4 secondes shulker devient invincible; 3 secondes vulnérable; 1 seconde invincible
     else if (invulnerabilityTimer < 4.0f) {
         isInvulnerable = true;
     }
     else {
-        invulnerabilityTimer = 0.0f;
+        invulnerabilityTimer = 0.0f; // Reset à 0
     }
 
     static float shotTimer = 0.0f;
@@ -403,7 +414,7 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
             {x + rect.w / 2 - 4, y + rect.h, 8, 8}
                 });
         }
-        shotTimer = 0.0f;
+        shotTimer = 0.0f; // Rest à 0
 
         
     }
@@ -440,6 +451,7 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
 }
 
 void ShulkerEnemy::render(SDL_Renderer* renderer) {
+    // Couleur de l'ennemi en fonction de son état
     if (isInvulnerable) {
         SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
     }
@@ -449,7 +461,7 @@ void ShulkerEnemy::render(SDL_Renderer* renderer) {
 
     SDL_RenderFillRect(renderer, &rect);
 
-
+    // Couleur du projectile
     SDL_SetRenderDrawColor(renderer, 200, 0, 255, 255);
     for (auto& p : projectiles)
         SDL_RenderFillRect(renderer, &p.rect);
@@ -471,7 +483,7 @@ DragonBoss::DragonBoss(float px, float py, int sw, int sh) : Enemy(px, py,sw,sh)
 
 void DragonBoss::update(float deltaTime, Player& player) {
 
-
+    // Position et vitesse de tout les projectiles
     static float shotTimer = 0.0f;
     shotTimer += deltaTime;
     if (shotTimer >= 2.0f) {
@@ -573,7 +585,6 @@ void EndermanEnemy::update(float deltaTime, Player& player) {
 void EndermanEnemy::render(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 255, 30, 90, 160);
     SDL_RenderFillRect(renderer, &rect);
-    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
 int EndermanEnemy::getType() const { return 8; }
