@@ -990,10 +990,9 @@ std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, 
     else if (type == 4) return std::make_unique<SkeletonEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 5) return std::make_unique<BlazeEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 8) return std::make_unique<Enderman>(x, y, screenWidth, screenHeight);
-    else if (type == 9) return std::make_unique<DragonEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 8) return std::make_unique<EndermanEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 9) return std::make_unique<DragonBoss>(x, y, screenWidth, screenHeight);
     else if (type == 10) return std::make_unique<PhantomEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 11) return std::make_unique<SculkEnemy>(x, y, screenWidth, screenHeight);
-    // Retiré : else if (type == 12) return std::make_unique<WardenBoss>(x, y, screenWidth, screenHeight);
     return nullptr;
 }
