@@ -35,6 +35,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath) {
     DragonHealth = 100;
     WardenHealth = 150;
     ElderGuardianHealth = 80;
+    WitherBossHealth = 80;
     enemies.clear();
     allProjectiles.clear();
 
@@ -126,7 +127,7 @@ void LevelBase::handleCollisions() {
                         }
                         break;
                     }
-
+                    // ElderGuardian (type 3)
                     else if (enemyType == 3) {
                         ElderGuardianHealth--;
                         std::cout << "ElderGuardian touche HP restant: " << ElderGuardianHealth << "\n";
@@ -136,6 +137,24 @@ void LevelBase::handleCollisions() {
                             levelCompleted = true;
                             score += 1000;
                             std::cout << "ElderGuardian vaincu!\n";
+                            eit = enemies.erase(eit);
+                        }
+                        else {
+                            ++eit;
+                        }
+                        break;
+                    }
+
+                    // Wither (type 13)
+                    if (enemyType == 13) {
+                        WitherBossHealth--;
+                        std::cout << "Wither touche HP restant: " << WitherBossHealth << "\n";
+                        hit = true;  // IMPORTANT: d�truit le projectile
+
+                        if (WitherBossHealth <= 0) {
+                            levelCompleted = true;
+                            score += 1000;
+                            std::cout << "Wither vaincu!\n";
                             eit = enemies.erase(eit);
                         }
                         else {

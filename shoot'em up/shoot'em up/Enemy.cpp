@@ -366,6 +366,51 @@ void BlazeEnemy::render(SDL_Renderer* renderer) {
 
 int BlazeEnemy::getType() const { return 5; }
 
+WitherBoss::WitherBoss(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
+
+void WitherBoss::update(float deltaTime, Player& player) {
+    y += 100.0f * deltaTime;
+    rect.x = x;
+    rect.y = y;
+
+    static float shotTimer = 0.0f;
+    shotTimer += deltaTime;
+    if (shotTimer >= 2.0f) {
+        float dx = player.x - x;
+        float dy = player.y - y;
+        float distance = sqrt(dx * dx + dy * dy);
+        float speed = 200.0f;
+        float vx = (dx / distance) * speed;
+        float vy = (dy / distance) * speed;
+        projectiles.push_back({
+            x + rect.w / 2 - 4,
+            y + rect.h,
+            vx,
+            vy,
+            false,
+            {x + rect.w / 2 - 4,y + rect.h,8,8}
+            });
+        shotTimer = 0.0f;
+    }
+    for (auto it = projectiles.begin();
+        it != projectiles.end(); ) {
+
+        it->update(deltaTime);
+        if (it->isOffScreen(screenWidth, screenHeight))
+            it = projectiles.erase(it);
+        else ++it;
+    }
+}
+
+void WitherBoss::render(SDL_Renderer* renderer) {
+    SDL_SetRenderDrawColor(renderer, 255, 109, 31, 255);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
+    for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
+}
+
+int WitherBoss::getType() const { return 5; }
+
 ShulkerEnemy::ShulkerEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh),
     invulnerabilityTimer(0.0f),// Timer à 0
     isInvulnerable(false) // COmmence en étant invincible = faux
@@ -1005,5 +1050,6 @@ std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, 
     else if (type == 9) return std::make_unique<DragonBoss>(x, y, screenWidth, screenHeight);
     else if (type == 10) return std::make_unique<PhantomEnemy>(x, y, screenWidth, screenHeight);
     else if (type == 11) return std::make_unique<SculkEnemy>(x, y, screenWidth, screenHeight);
+    else if (type == 13) return std::make_unique<WitherBoss>(x, y, screenWidth, screenHeight);
     return nullptr;
 }

@@ -104,6 +104,15 @@ public:
     int getType() const override;
 };
 
+class WitherBoss : public Enemy {
+public:
+    WitherBoss(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
 
 class ShulkerEnemy : public Enemy {
 private:

@@ -41,6 +41,7 @@ public:
     int DragonHealth;   // Pour le Dragon (type 9)
     int WardenHealth;   // Pour le Warden (type 12)
     int ElderGuardianHealth; // Pour le ElderGuardian (type 3)
+    int WitherBossHealth; // Pour le Wither (type 13)
 
     virtual void handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu);
     virtual void update(float deltaTime);
