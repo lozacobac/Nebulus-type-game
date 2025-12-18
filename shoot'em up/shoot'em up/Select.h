@@ -9,11 +9,11 @@ public:
     void handleEvent(const SDL_Event& event, int& selectedLevel);
     void draw(SDL_Renderer* renderer);
 
-    // Nouvelle methode pour afficher l'ecran de transition
+    // Afficher l'écran de transition
     void showWorldTransition(int worldNumber);
     bool isInTransition() const { return inTransition; }
 
-    // Afficher l'ecran de Game Over
+    // Afficher l'écran de Game Over
     void showWorldGameOver(int worldNumber);
     bool isInGameOver() const { return inGameOver; }
 
@@ -54,7 +54,7 @@ private:
     Button buttonLevel3;
     Button buttonLevel4;
 
-    // Boutons pour l'ecran de transition
+    // Boutons pour l'écran de transition
     Button buttonBackToMenu;
     Button buttonNextWorld;
 

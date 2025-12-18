@@ -9,16 +9,17 @@ LevelBase::LevelBase(TTF_Font* font, int width, int height)
     levelFailed(false),
     score(0),
     font(font),
-    DragonHealth(100),    // Santé du Dragon
-    WardenHealth(200),    // Santé du Warden
+    DragonHealth(100),    // Santï¿½ du Dragon
+    WardenHealth(200),    // Santï¿½ du Warden
     screenWidth(width),
     screenHeight(height),
     scoreTexture(nullptr),
     player(width, height)
 {
-    menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");
+    menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");// Crï¿½er le bouton Menu
 }
 
+// Les bases pour le bon fonctionnement du code dans LevelBase
 bool LevelBase::loadFromFile(const std::string& scriptPath) {
     if (!LevelLoader::loadLevelScript(scriptPath, script)) {
         std::cerr << "[ERROR] Failed to load level script: " << scriptPath << "\n";
@@ -50,7 +51,7 @@ void LevelBase::executeCommand(const ScriptCommand& cmd) {
         float y = yPercent * screenHeight;
         int type = std::stoi(cmd.params[3]);
 
-        // Condition spéciale pour WardenBoss (type 12) : créer avec &WardenHealth pour lier la santé
+        // Condition spï¿½ciale pour WardenBoss (type 12) : crï¿½er avec &WardenHealth pour lier la santï¿½
         if (type == 12) {
             auto enemy = std::make_unique<WardenBoss>(x, y, screenWidth, screenHeight, WardenHealth);
             if (enemy) {
@@ -93,7 +94,7 @@ void LevelBase::handleCollisions() {
                     if (enemyType == 9) {
                         DragonHealth--;
                         std::cout << "Dragon touche HP restant: " << DragonHealth << "\n";
-                        hit = true;  // IMPORTANT: détruit le projectile
+                        hit = true;  // IMPORTANT: dï¿½truit le projectile
 
                         if (DragonHealth <= 0) {
                             levelCompleted = true;
@@ -110,7 +111,7 @@ void LevelBase::handleCollisions() {
                     else if (enemyType == 12) {
                         WardenHealth--;
                         std::cout << "Warden touche HP restant: " << WardenHealth << "\n";
-                        hit = true;  // IMPORTANT: détruit le projectile
+                        hit = true;  // IMPORTANT: dï¿½truit le projectile
 
                         if (WardenHealth <= 0) {
                             levelCompleted = true;
@@ -138,12 +139,13 @@ void LevelBase::handleCollisions() {
             }
         }
         else {
+            // Enlever 1 vie si le joueur s'est fait toucher et n'est pas invincible
             if (player.checkCollision(pit->rect)) {
                 if (!player.isInvincible()) {
                     player.lives--;
-                    player.invicibilityTimer = 1.0f;
+                    player.invicibilityTimer = 1.0f; // 1 seconde d'invincibilitï¿½
                     std::cout << "Player hit! Lives : " << player.lives << "\n";
-                    if (player.lives <= 0) {
+                    if (player.lives <= 0) { // Quand le joueur a en dessous ou a 0 vies alors Game over
                         levelFailed = true;
                     }
                 }
@@ -151,6 +153,7 @@ void LevelBase::handleCollisions() {
             }
         }
 
+        // Dï¿½truirent les projectiles qui sortent de l'ï¿½cran
         if (hit || pit->isOffScreen(screenWidth, screenHeight)) {
             pit = allProjectiles.erase(pit);
         }
@@ -175,6 +178,7 @@ void LevelBase::handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu) {
     }
 }
 
+// Met ï¿½ jour le niveau constamment
 void LevelBase::update(float deltaTime) {
     const bool* keys = SDL_GetKeyboardState(NULL);
     player.update(keys, deltaTime);
@@ -204,11 +208,13 @@ void LevelBase::update(float deltaTime) {
 
     handleCollisions();
 
+    // Si il n'y a plus d'ennemis alors le niveau est terminï¿½e
     if (enemies.empty() && currentCommand >= script.size() && !levelCompleted) {
         levelCompleted = true;
     }
 }
 
+// Couleurs
 void LevelBase::draw(SDL_Renderer* renderer) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderFillRect(renderer, nullptr);
@@ -228,6 +234,7 @@ void LevelBase::draw(SDL_Renderer* renderer) {
 
     renderButton(renderer, &menuButton, font);
 
+    // Afficher le score et les vies
     std::string scoreText = "Score : " + std::to_string(score);
     SDL_RenderDebugText(renderer, 10, 10, scoreText.c_str());
     std::string livesText = "Lives : " + std::to_string(player.lives);
