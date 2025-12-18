@@ -11,6 +11,7 @@ LevelBase::LevelBase(TTF_Font* font, int width, int height)
     font(font),
     DragonHealth(100),    // Sant� du Dragon
     WardenHealth(200),    // Sant� du Warden
+    ElderGuardianHealth(80),    // Sant� du ElderGuardian
     screenWidth(width),
     screenHeight(height),
     scoreTexture(nullptr),
@@ -33,6 +34,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath) {
     score = 0;
     DragonHealth = 100;
     WardenHealth = 150;
+    ElderGuardianHealth = 80;
     enemies.clear();
     allProjectiles.clear();
 
@@ -98,7 +100,7 @@ void LevelBase::handleCollisions() {
 
                         if (DragonHealth <= 0) {
                             levelCompleted = true;
-                            score += 500;
+                            score += 1000;
                             std::cout << "Dragon vaincu!\n";
                             eit = enemies.erase(eit);
                         }
@@ -117,6 +119,23 @@ void LevelBase::handleCollisions() {
                             levelCompleted = true;
                             score += 1000;
                             std::cout << "Warden vaincu!\n";
+                            eit = enemies.erase(eit);
+                        }
+                        else {
+                            ++eit;
+                        }
+                        break;
+                    }
+
+                    else if (enemyType == 3) {
+                        ElderGuardianHealth--;
+                        std::cout << "ElderGuardian touche HP restant: " << ElderGuardianHealth << "\n";
+                        hit = true;  // IMPORTANT: d�truit le projectile
+
+                        if (ElderGuardianHealth <= 0) {
+                            levelCompleted = true;
+                            score += 1000;
+                            std::cout << "ElderGuardian vaincu!\n";
                             eit = enemies.erase(eit);
                         }
                         else {
