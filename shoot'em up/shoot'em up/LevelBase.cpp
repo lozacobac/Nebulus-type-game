@@ -25,7 +25,8 @@ bool LevelBase::loadFromFile(const std::string& scriptPath, SDL_Renderer* render
         return false;
     }
 
-    player.loadTexture(renderer, "Img/player.png");
+    player.loadTexture(renderer, "Assets/player.png");
+    player.loadProjectileTexture(renderer, "assets/Projectile_P.png");
 
     levelStartTime = SDL_GetTicks();
     currentCommand = 0;

@@ -8,7 +8,8 @@ Player::Player() :
     invicibilityTimer(0.0f),
     screenWidth(800),
     screenHeight(600),
-    texture(nullptr)
+    texture(nullptr),
+    projectileTexture(nullptr)
 {
 }
 
@@ -20,7 +21,8 @@ Player::Player(int width, int height) :
     invicibilityTimer(0.0f),
     screenWidth(width),
     screenHeight(height),
-    texture(nullptr)
+    texture(nullptr),
+    projectileTexture(nullptr)
 {
 }
 
@@ -32,7 +34,8 @@ Player::Player(int width, int height, SDL_Renderer* renderer, const char* imageP
     invicibilityTimer(0.0f),
     screenWidth(width),
     screenHeight(height),
-    texture(nullptr)
+    texture(nullptr),
+    projectileTexture(nullptr)
 {
     SDL_Surface* surface = IMG_Load(imagePath);
     if (surface) {
@@ -55,6 +58,10 @@ Player::~Player() {
     if (texture) {
         SDL_DestroyTexture(texture);
         texture = nullptr;
+    }
+    if (projectileTexture) {
+        SDL_DestroyTexture(projectileTexture);
+        projectileTexture = nullptr;
     }
 }
 
@@ -89,14 +96,16 @@ void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bo
 
 
     if (keys[SDL_SCANCODE_SPACE] && shotTimer >= 0.1f) {
-        projectiles.push_back({
-            x + 12,
-            y, 
-            0, 
-            -1000.0f, 
-            true, 
-            {x + rect.w / 2 - 4,y,8,8}
-        });
+        projectiles.push_back(Projectile(
+            x + rect.w / 2 - 8,
+            y,
+            0,
+            -1000.0f,
+            true,
+            { x + rect.w / 2 - 8, y, 16, 16 },
+            projectileTexture
+        ));
+        std::cout << "[DEBUG] Projectile created! Texture: " << (projectileTexture ? "OK" : "NULL") << "\n";
         shotTimer = 0.0f;
     }
     for (auto it = projectiles.begin(); it != projectiles.end(); ) {
@@ -130,6 +139,28 @@ void Player::loadTexture(SDL_Renderer* renderer, const char* imagePath) {
     }
 }
 
+void Player::loadProjectileTexture(SDL_Renderer* renderer, const char* imagePath) {
+    if (projectileTexture) {
+        SDL_DestroyTexture(projectileTexture);
+    }
+
+    SDL_Surface* surface = IMG_Load(imagePath);
+    if (surface) {
+        projectileTexture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_DestroySurface(surface);
+
+        if (projectileTexture) {
+            std::cout << "[INFO] Projectile texture loaded\n";
+        }
+        else {
+            std::cerr << "[ERROR] Failed to create projectile texture: " << SDL_GetError() << "\n";
+        }
+    }
+    else {
+        std::cerr << "[ERROR] Failed to load projectile image: " << SDL_GetError() << "\n";
+    }
+}
+
 void Player::render(SDL_Renderer* renderer) {
     if (texture) {
         if (isInvincible()) {
@@ -152,7 +183,13 @@ void Player::render(SDL_Renderer* renderer) {
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     for (auto& p : projectiles) {
-        SDL_RenderFillRect(renderer, &p.rect);
+        if (p.texture) {
+            SDL_RenderTexture(renderer, p.texture, nullptr, &p.rect);
+        }
+        else {
+            SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+            SDL_RenderFillRect(renderer, &p.rect);
+        }
     }
 }
 
