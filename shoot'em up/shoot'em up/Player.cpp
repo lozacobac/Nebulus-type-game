@@ -3,7 +3,7 @@
 Player::Player() : 
     x(400),
     y(500),
-    lives(3),
+    lives(5),
     rect({ x, y, 32, 32 }),
     invicibilityTimer(0.0f),
     screenWidth(800),
@@ -16,7 +16,7 @@ Player::Player() :
 Player::Player(int width, int height) :
     x(width / 2.0f),
     y(height - 100),
-    lives(3),
+    lives(5),
     rect({ width / 2.0f, height - 100.0f, 32, 32 }),
     invicibilityTimer(0.0f),
     screenWidth(width),
@@ -29,7 +29,7 @@ Player::Player(int width, int height) :
 Player::Player(int width, int height, SDL_Renderer* renderer, const char* imagePath) :
     x(width / 2.0f),
     y(height - 100),
-    lives(3),
+    lives(5),
     rect({ width / 2.0f, height - 100.0f, 32, 32 }),
     invicibilityTimer(0.0f),
     screenWidth(width),
@@ -71,17 +71,25 @@ void Player::setScreenBounds(int width, int height) {
 }
 
 void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bool*
-    float speed = 300;
+    float speed = 500;
     if (keys[SDL_SCANCODE_LEFT] || keys[SDL_SCANCODE_A])
         x -= speed * deltaTime;
     if (keys[SDL_SCANCODE_RIGHT] || keys[SDL_SCANCODE_D])
         x += speed * deltaTime;
+    if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_UP])
+        y -= speed * deltaTime;
+    if (keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_DOWN])
+        y += speed * deltaTime;
     if (keys[SDL_SCANCODE_T])
         lives += 100000;
     if (x < 0)
         x = 0;
     if (x > screenWidth-rect.w)
         x = screenWidth-rect.w;
+    if (y < 0)
+        y = 0;
+    if (y > screenHeight - rect.h)
+        y = screenHeight - rect.h;
     rect.x = x;
     rect.y = y;
 
@@ -105,7 +113,6 @@ void Player::update(const bool* keys, float deltaTime) {  // Changé Uint8* en bo
             { x + rect.w / 2 - 8, y, 16, 16 },
             projectileTexture
         ));
-        std::cout << "[DEBUG] Projectile created! Texture: " << (projectileTexture ? "OK" : "NULL") << "\n";
         shotTimer = 0.0f;
     }
     for (auto it = projectiles.begin(); it != projectiles.end(); ) {

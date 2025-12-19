@@ -11,7 +11,7 @@ LevelBase::LevelBase(TTF_Font* font, int width, int height)
     font(font),
     DragonHealth(100),    // Sant� du Dragon
     WardenHealth(200),    // Sant� du Warden
-    ElderGuardianHealth(80),    // Sant� du ElderGuardian
+    ElderGuardianHealth(50),    // Sant� du ElderGuardian
     screenWidth(width),
     screenHeight(height),
     scoreTexture(nullptr),
