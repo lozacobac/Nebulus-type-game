@@ -18,6 +18,7 @@ protected:
     std::vector<ScriptCommand> script;
     Button menuButton;
     SDL_Texture* scoreTexture;
+    SDL_Renderer* renderer;
     SDL_FRect scoreRect;
     size_t currentCommand;
     Uint64 levelStartTime;
@@ -27,7 +28,7 @@ protected:
     int screenWidth;
     int screenHeight;
 
-    virtual void executeCommand(const ScriptCommand& cmd);
+    virtual void executeCommand(const ScriptCommand& cmd,SDL_Renderer* renderer);
     void handleCollisions();
 
 public:
@@ -44,7 +45,7 @@ public:
     int WitherBossHealth; // Pour le Wither (type 13)
 
     virtual void handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu);
-    virtual void update(float deltaTime);
+    virtual void update(float deltaTime, SDL_Renderer* renderer);
     virtual void draw(SDL_Renderer* renderer);
 
     bool isCompleted() const;

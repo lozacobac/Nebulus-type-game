@@ -213,7 +213,7 @@ int Game::run() {
             custom->update();
         }
         else if (currentState == State::LEVEL && currentLevel) {
-            currentLevel->update(deltaTime);
+            currentLevel->update(deltaTime,renderer);
 
             if (currentLevel->isCompleted()) {
                 std::cout << "[INFO] Level completed!\n";

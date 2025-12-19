@@ -15,7 +15,8 @@ LevelBase::LevelBase(TTF_Font* font, int width, int height)
     screenWidth(width),
     screenHeight(height),
     scoreTexture(nullptr),
-    player(width, height)
+    player(width, height),
+    renderer(nullptr)
 {
     menuButton = createButton(10.0f, 425.0f, 75.0f, 50.0f, "Menu");// Cr�er le bouton Menu
 }
@@ -26,8 +27,10 @@ bool LevelBase::loadFromFile(const std::string& scriptPath, SDL_Renderer* render
         return false;
     }
 
+    this->renderer = renderer;
+
     player.loadTexture(renderer, "Assets/player.png");
-    player.loadProjectileTexture(renderer, "assets/Projectile_P.png");
+    player.loadProjectileTexture(renderer, "Assets/Projectile_P.png");
 
     levelStartTime = SDL_GetTicks();
     currentCommand = 0;
@@ -36,7 +39,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath, SDL_Renderer* render
     score = 0;
     DragonHealth = 100;
     WardenHealth = 150;
-    ElderGuardianHealth = 80;
+    ElderGuardianHealth = 50;
     WitherBossHealth = 80;
     enemies.clear();
     allProjectiles.clear();
@@ -46,7 +49,7 @@ bool LevelBase::loadFromFile(const std::string& scriptPath, SDL_Renderer* render
     return true;
 }
 
-void LevelBase::executeCommand(const ScriptCommand& cmd) {
+void LevelBase::executeCommand(const ScriptCommand& cmd,SDL_Renderer* renderer) {
     std::cout << "[CMD] " << cmd.command << " at time " << cmd.time << "\n";
 
     if (cmd.command == "SPAWN" && cmd.params.size() >= 4 && cmd.params[0] == "ENEMY") {
@@ -66,7 +69,7 @@ void LevelBase::executeCommand(const ScriptCommand& cmd) {
         }
         else {
             // Pour les autres ennemis, utiliser createEnemy
-            auto enemy = createEnemy(type, x, y, screenWidth, screenHeight);
+            auto enemy = createEnemy(type, x, y, screenWidth, screenHeight,renderer);
             if (enemy) {
                 enemies.push_back(std::move(enemy));
                 std::cout << "[INFO] Enemy spawned at (" << x << ", " << y << ") type " << type << "\n";
@@ -148,7 +151,7 @@ void LevelBase::handleCollisions() {
                     }
 
                     // Wither (type 13)
-                    if (enemyType == 13) {
+                    if (enemyType == 6) {
                         WitherBossHealth--;
                         std::cout << "Wither touche HP restant: " << WitherBossHealth << "\n";
                         hit = true;  // IMPORTANT: d�truit le projectile
@@ -219,13 +222,13 @@ void LevelBase::handleEvent(const SDL_Event& event, bool& shouldSwitchToMenu) {
 }
 
 // Met � jour le niveau constamment
-void LevelBase::update(float deltaTime) {
+void LevelBase::update(float deltaTime, SDL_Renderer* renderer) {  // ← AJOUTE renderer
     const bool* keys = SDL_GetKeyboardState(NULL);
     player.update(keys, deltaTime);
 
     float elapsed = (SDL_GetTicks() - levelStartTime) / 1000.0f;
     while (currentCommand < script.size() && elapsed >= script[currentCommand].time) {
-        executeCommand(script[currentCommand]);
+        executeCommand(script[currentCommand], renderer);  // ← AJOUTE renderer ICI
         currentCommand++;
     }
 
@@ -248,7 +251,6 @@ void LevelBase::update(float deltaTime) {
 
     handleCollisions();
 
-    // Si il n'y a plus d'ennemis alors le niveau est termin�e
     if (enemies.empty() && currentCommand >= script.size() && !levelCompleted) {
         levelCompleted = true;
     }

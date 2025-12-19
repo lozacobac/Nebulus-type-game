@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include <vector>
 #include <memory>
 #include <cmath>
@@ -18,9 +19,12 @@ public:
     SDL_FRect rect;
     std::vector<Projectile> projectiles;
     float moveTimer;
+    SDL_Texture* texture;
 
     Enemy(float px, float py, int sw, int sh);
-    virtual ~Enemy() = default;
+    virtual ~Enemy();
+
+    void loadTexture(SDL_Renderer* renderer, const char* imagePath);
 
     virtual void update(float deltaTime, Player& player) = 0; // IA de l'ennemi
     virtual void render(SDL_Renderer* renderer) = 0; // Dessiner l'ennemi
@@ -175,4 +179,4 @@ private:
     int maxHealth;         // Santé maximale pour calculer les phases
 };
 
-std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight);
+std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight,SDL_Renderer* renderer);

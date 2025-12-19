@@ -8,10 +8,39 @@ Enemy::Enemy(float px, float py,int sw, int sh) :
     moveTimer(0.0f),
     shotTimer(0.0f),
     screenWidth(sw),
-    screenHeight(sh)
+    screenHeight(sh),
+    texture(nullptr)
 {
 }
 
+Enemy::~Enemy() {
+    if (texture) {
+        SDL_DestroyTexture(texture);
+        texture = nullptr;
+    }
+}
+
+void Enemy::loadTexture(SDL_Renderer* renderer, const char* imagePath) {
+    if (texture) {
+        SDL_DestroyTexture(texture);
+    }
+
+    SDL_Surface* surface = IMG_Load(imagePath);
+    if (surface) {
+        texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_DestroySurface(surface);
+
+        if (texture) {
+            std::cout << "[INFO] Enemy texture loaded: " << imagePath << "\n";
+        }
+        else {
+            std::cerr << "[ERROR] Failed to create enemy texture: " << SDL_GetError() << "\n";
+        }
+    }
+    else {
+        std::cerr << "[ERROR] Failed to load enemy image: " << SDL_GetError() << "\n";
+    }
+}
 
 bool Enemy::checkCollision(const SDL_FRect& other) {
     return SDL_HasRectIntersectionFloat(&rect, &other);
@@ -147,9 +176,14 @@ void Drowned::update(float deltaTime, Player& player)
     }
 }
 
-void Drowned::render(SDL_Renderer* renderer){
-    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
-    SDL_RenderFillRect(renderer, &rect);
+void Drowned::render(SDL_Renderer* renderer) {
+    if (texture) {
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
@@ -208,10 +242,14 @@ void Guardian::update(float deltaTime, Player& player) {
         else ++it;
     }
 }
-void Guardian::render(SDL_Renderer* renderer)
-{
-    SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
-    SDL_RenderFillRect(renderer, &rect);
+void Guardian::render(SDL_Renderer* renderer) {
+    if (texture) {
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 62, 137, 134, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
@@ -311,10 +349,13 @@ void SkeletonEnemy::update(float deltaTime, Player& player) {
 }
 
 void SkeletonEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 206, 206, 206, 255);
-    SDL_RenderFillRect(renderer, &rect);
-    SDL_FlushRenderer(renderer);
-
+    if (texture) {
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 206, 206, 206, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
@@ -358,8 +399,13 @@ void BlazeEnemy::update(float deltaTime, Player& player) {
 }
 
 void BlazeEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 255, 109, 31, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    if (texture) {
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 255, 109, 31, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
@@ -369,7 +415,6 @@ int BlazeEnemy::getType() const { return 5; }
 WitherBoss::WitherBoss(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh) {}
 
 void WitherBoss::update(float deltaTime, Player& player) {
-    y += 100.0f * deltaTime;
     rect.x = x;
     rect.y = y;
 
@@ -409,7 +454,7 @@ void WitherBoss::render(SDL_Renderer* renderer) {
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
 
-int WitherBoss::getType() const { return 5; }
+int WitherBoss::getType() const { return 6; }
 
 ShulkerEnemy::ShulkerEnemy(float px, float py, int sw, int sh) : Enemy(px, py, sw, sh),
     invulnerabilityTimer(0.0f),// Timer à 0
@@ -496,17 +541,26 @@ void ShulkerEnemy::update(float deltaTime, Player& player) {
 }
 
 void ShulkerEnemy::render(SDL_Renderer* renderer) {
-    // Couleur de l'ennemi en fonction de son état
-    if (isInvulnerable) {
-        SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+    if (texture) {
+        // Changer la couleur de la texture selon l'état
+        if (isInvulnerable) {
+            SDL_SetTextureColorMod(texture, 128, 128, 128);  // Grisé
+        }
+        else {
+            SDL_SetTextureColorMod(texture, 255, 255, 255);  // Normal
+        }
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
     }
     else {
-        SDL_SetRenderDrawColor(renderer, 100, 100, 0, 255);
+        if (isInvulnerable) {
+            SDL_SetRenderDrawColor(renderer, 80, 80, 80, 255);
+        }
+        else {
+            SDL_SetRenderDrawColor(renderer, 100, 100, 0, 255);
+        }
+        SDL_RenderFillRect(renderer, &rect);
     }
 
-    SDL_RenderFillRect(renderer, &rect);
-
-    // Couleur du projectile
     SDL_SetRenderDrawColor(renderer, 200, 0, 255, 255);
     for (auto& p : projectiles)
         SDL_RenderFillRect(renderer, &p.rect);
@@ -628,8 +682,13 @@ void EndermanEnemy::update(float deltaTime, Player& player) {
 }
 
 void EndermanEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 255, 30, 90, 160);
-    SDL_RenderFillRect(renderer, &rect);
+    if (texture) {
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 255, 30, 90, 160);
+        SDL_RenderFillRect(renderer, &rect);
+    }
 }
 
 int EndermanEnemy::getType() const { return 8; }
@@ -669,8 +728,13 @@ void PhantomEnemy::update(float deltaTime, Player& player) {
 }
 
 void PhantomEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 0, 191, 255, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    if (texture) {
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 0, 191, 255, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
     SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
@@ -721,8 +785,13 @@ void SculkEnemy::update(float deltaTime, Player& player) {
 }
 
 void SculkEnemy::render(SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 139, 0, 0, 255);
-    SDL_RenderFillRect(renderer, &rect);
+    if (texture) {
+        SDL_RenderTexture(renderer, texture, nullptr, &rect);
+    }
+    else {
+        SDL_SetRenderDrawColor(renderer, 139, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &rect);
+    }
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
     for (auto& p : projectiles) SDL_RenderFillRect(renderer, &p.rect);
 }
@@ -1037,19 +1106,59 @@ void WardenBoss::render(SDL_Renderer* renderer) {
 
 int WardenBoss::getType() const { return 12; }
 
-std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight) {
-    if (type == 23) return std::make_unique<BasicEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 24) return std::make_unique<ZigzagEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 1) return std::make_unique<Drowned>(x, y, screenWidth, screenHeight);
-    else if (type == 2) return std::make_unique<Guardian>(x, y, screenWidth, screenHeight);
-    else if (type == 3) return std::make_unique<Elder_Guardian>(x, y, screenWidth, screenHeight);
-    else if (type == 4) return std::make_unique<SkeletonEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 5) return std::make_unique<BlazeEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 7) return std::make_unique<ShulkerEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 8) return std::make_unique<EndermanEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 9) return std::make_unique<DragonBoss>(x, y, screenWidth, screenHeight);
-    else if (type == 10) return std::make_unique<PhantomEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 11) return std::make_unique<SculkEnemy>(x, y, screenWidth, screenHeight);
-    else if (type == 13) return std::make_unique<WitherBoss>(x, y, screenWidth, screenHeight);
-    return nullptr;
+std::unique_ptr<Enemy> createEnemy(int type, float x, float y, int screenWidth, int screenHeight, SDL_Renderer* renderer) {
+    std::unique_ptr<Enemy> enemy = nullptr;
+
+    if (type == 23) {
+        enemy = std::make_unique<BasicEnemy>(x, y, screenWidth, screenHeight);
+    }
+    else if (type == 24) {
+        enemy = std::make_unique<ZigzagEnemy>(x, y, screenWidth, screenHeight);
+    }
+    else if (type == 1) {
+        enemy = std::make_unique<Drowned>(x, y, screenWidth, screenHeight);
+        if (enemy) enemy->loadTexture(renderer, "Assets/Drowned.png");
+    }
+    else if (type == 2) {
+        enemy = std::make_unique<Guardian>(x, y, screenWidth, screenHeight);
+        if (enemy) enemy->loadTexture(renderer, "Assets/Guardian.png");
+    }
+    else if (type == 3) {
+        enemy = std::make_unique<Elder_Guardian>(x, y, screenWidth, screenHeight);
+    }
+    else if (type == 4) {
+        enemy = std::make_unique<SkeletonEnemy>(x, y, screenWidth, screenHeight);
+        if (enemy) enemy->loadTexture(renderer, "Assets/Skeleton.png");
+    }
+    else if (type == 5) {
+        enemy = std::make_unique<BlazeEnemy>(x, y, screenWidth, screenHeight);
+        if (enemy) enemy->loadTexture(renderer, "Assets/Blaze.png");
+    }
+    else if (type == 6) {
+        enemy = std::make_unique<WitherBoss>(x, y, screenWidth, screenHeight);
+    }
+    else if (type == 7) {
+        enemy = std::make_unique<ShulkerEnemy>(x, y, screenWidth, screenHeight);
+        if (enemy) enemy->loadTexture(renderer, "Assets/Shulker.png");
+    }
+    else if (type == 8) {
+        enemy = std::make_unique<EndermanEnemy>(x, y, screenWidth, screenHeight);
+        if (enemy) enemy->loadTexture(renderer, "Assets/Enderman.png");
+    }
+    else if (type == 9) {
+        enemy = std::make_unique<DragonBoss>(x, y, screenWidth, screenHeight);
+    }
+    else if (type == 10) {
+        enemy = std::make_unique<PhantomEnemy>(x, y, screenWidth, screenHeight);
+        if (enemy) enemy->loadTexture(renderer, "Assets/Phantom.png");
+    }
+    else if (type == 11) {
+        enemy = std::make_unique<SculkEnemy>(x, y, screenWidth, screenHeight);
+        if (enemy) enemy->loadTexture(renderer, "Assets/Sculk.png");
+    }
+    else if (type == 13) {
+        enemy = std::make_unique<WitherBoss>(x, y, screenWidth, screenHeight);
+    }
+
+    return enemy;
 }
