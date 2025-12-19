@@ -12,7 +12,7 @@ class Enemy {
 protected:
     int screenWidth;
     int screenHeight;
-    float shotTimer;
+    float shotTimer; // cooldown pour le projectile
 public:
     float x, y;
     SDL_FRect rect;
@@ -22,10 +22,10 @@ public:
     Enemy(float px, float py, int sw, int sh);
     virtual ~Enemy() = default;
 
-    virtual void update(float deltaTime, Player& player) = 0;
-    virtual void render(SDL_Renderer* renderer) = 0;
-    virtual bool checkCollision(const SDL_FRect& other);
-    virtual int getType() const = 0;
+    virtual void update(float deltaTime, Player& player) = 0; // IA de l'ennemi
+    virtual void render(SDL_Renderer* renderer) = 0; // Dessiner l'ennemi
+    virtual bool checkCollision(const SDL_FRect& other); // Permet de savoir si oui ou non les dégats sont acceptés
+    virtual int getType() const = 0; // ID de l'ennemi
 };
 
 class BasicEnemy : public Enemy {
@@ -64,6 +64,7 @@ public:
     int getType()const override;
 
 private:
+    // Plusieurs états pour l'ennemi
     enum Phase { BURST, PAUSE };
     Phase currentPhase = BURST;
     float phaseTimer = 0.0f;
@@ -79,6 +80,7 @@ public:
     int getType()const override;
 
 private:
+    // Plusieurs états pour l'ennemi
     enum Phase { BURST, PAUSE };
     Phase currentPhase = BURST;
     float phaseTimer = 0.0f;
@@ -102,9 +104,19 @@ public:
     int getType() const override;
 };
 
+class WitherBoss : public Enemy {
+public:
+    WitherBoss(float px, float py, int sw, int sh);
+
+    void update(float deltaTime, Player& player) override;
+    void render(SDL_Renderer* renderer) override;
+    int getType() const override;
+};
+
 
 class ShulkerEnemy : public Enemy {
 private:
+    // Est invincible en fonction du temps
     float invulnerabilityTimer;
     bool isInvulnerable;
 public:
@@ -112,7 +124,7 @@ public:
 
     void update(float deltaTime, Player& player) override;
     void render(SDL_Renderer* renderer) override;
-    bool checkCollision(const SDL_FRect& other) override;
+    bool checkCollision(const SDL_FRect& other) override; // Permet de savoir si oui ou non les dégats sont acceptés
     int getType() const override;
 };
 
