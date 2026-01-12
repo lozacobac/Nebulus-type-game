@@ -1,0 +1,43 @@
+#pragma once
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <string>
+#include <algorithm>
+#include <iostream>
+
+class TextBox {
+public:
+    TextBox();
+    TextBox(float x, float y, float width, float height, size_t maxLength = 32, TTF_Font* font = nullptr);
+    ~TextBox();
+
+    void handleEvent(const SDL_Event& e);
+    void update();
+    void render(SDL_Renderer* renderer);
+
+    void setPosition(float x, float y);
+    void setSize(float width, float height);
+    void setText(const std::string& newText);
+    std::string getText() const;
+    void clear();
+
+    void setFocused(bool focus);
+    bool isFocused() const;
+
+private:
+    SDL_FRect m_box;
+    std::string m_text;
+    size_t m_maxLength;
+    bool m_focused;
+    bool m_cursorVisible;
+    Uint32 m_lastBlink;
+
+    SDL_Cursor* m_cursorIBeam;
+    SDL_Cursor* m_cursorArrow;
+    
+    TTF_Font* m_font;
+
+    bool isPointInside(float x, float y) const;
+    void updateCursor(SDL_Renderer* renderer);
+};
+
